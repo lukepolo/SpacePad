@@ -35,12 +35,25 @@ Auth::routes();
 
 /*
 |--------------------------------------------------------------------------
+| OAuth Routes
+|--------------------------------------------------------------------------
+|
+*/
+Route::get('/provider/{provider}/link', 'Auth\OauthController@newProvider');
+Route::get('/provider/{provider}/callback', 'Auth\OauthController@getHandleProviderCallback');
+
+/*
+|--------------------------------------------------------------------------
 | App Routes
 |--------------------------------------------------------------------------
 |
 */
 
 Route::get('/', 'Controller@app');
+
+
+Route::get('/rooms', 'Controller@getRooms');
+Route::get('/calendars/{calendarId}', 'Controller@getCalendarEvents');
 
 Route::group([
     'middleware' => [

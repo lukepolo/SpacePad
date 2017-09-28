@@ -35,4 +35,10 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'office365' => [
+        'application_id' => env('OFFICE_365_APPLICATION_ID'),
+        'application_secret' => env('OFFICE_365_SECRET'),
+        'redirect'      => env('OFFICE_365_REDIRECT_URI'),
+    ]
+
 ];
