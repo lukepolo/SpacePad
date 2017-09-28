@@ -50,29 +50,28 @@ class Controller extends BaseController
     {
         $provider = 'office365';
 
-//        $rooms = $this->calendarService->getRooms($provider);
+        $rooms = $this->calendarService->getRooms($provider);
 
         $calendar = $this->calendarService->getCalendar($provider, [
             "name" => "Standing Desk",
-            "provider_calendar_id" => "standingdesk@forcemed.com"
+            "owner" => "lpolicinski@forcemed.com"
         ]);
-
-        dd($calendar);
-
 
         Calendar::firstOrCreate([
             'provider' => $provider,
+            'name' => $calendar['name'],
             'user_id' => auth()->user()->id,
-            'name' => $calendars[4]['name'],
-            'provider_calendar_id' => $calendars[4]['provider_calendar_id'],
+            'provider_calendar_id' => $calendar['id'],
+            'provider_calendar_name' => $calendar['name'],
+            'provider_calendar_owner' => $calendar['owner'],
         ]);
 
-        return $calendars;
+        return $rooms;
     }
 
     public function getCalendarEvents($calendarId)
     {
-        dd($this->calendarService->getCalendarEvents($calendarId));
+        dd();
     }
 
     /**

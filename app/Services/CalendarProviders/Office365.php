@@ -2,15 +2,16 @@
 
 namespace App\Services\CalendarProviders;
 
-use App\Exceptions\InvalidCalendarRequest;
-use App\Models\Calendar;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use App\Models\Calendar;
 use Illuminate\Http\Request;
 use App\Models\CalendarProvider;
+use Illuminate\Support\Collection;
 use Illuminate\Http\RedirectResponse;
 use App\Exceptions\InvalidTokenRequest;
 use GuzzleHttp\Exception\ClientException;
+use App\Exceptions\InvalidCalendarRequest;
 
 /**
  * Class Office365Service
@@ -21,35 +22,30 @@ use GuzzleHttp\Exception\ClientException;
  */
 class Office365
 {
+    private $calendarProvider;
+
     private $loginURL = "https://login.microsoftonline.com";
 
-    private $tokenURL = "/common/oauth2/v2.0/token";
-    private $authorizeURL = '/common/oauth2/v2.0/authorize';
-    private $graphApiURL = "https://graph.microsoft.com/v1.0";
-    private $outlookApiURL = "https://outlook.office.com/api/beta";
+    protected $tokenURL = "/common/oauth2/v2.0/token";
+    protected $authorizeURL = '/common/oauth2/v2.0/authorize';
+    protected $graphApiURL = "https://graph.microsoft.com/v1.0";
+    protected $outlookApiURL = "https://outlook.office.com/api/beta";
 
-    private $applicationId;
-    private $applicationSecret;
-    private $redirectURL;
-    private $parameters = [];
+    protected $redirectURL;
+    protected $applicationId;
+    protected $applicationSecret;
 
-    private $graphScopes = [
+    protected $graphScopes = [
         'https://graph.microsoft.com/User.ReadBasic.All',
         'https://graph.microsoft.com/Calendars.ReadWrite',
         'offline_access',
     ];
 
-    private $outlookScopes = [
+    protected $outlookScopes = [
         'https://outlook.office.com/User.ReadBasic.All',
         'https://outlook.office.com/Calendars.ReadWrite',
         'offline_access',
     ];
-
-    private $scopeSeparator = ' ';
-    private $stateless = false;
-
-    private $calendarService;
-    private $calendarProvider;
 
     /**
      * Office365Service constructor.
@@ -61,7 +57,6 @@ class Office365
         $this->redirectURL = config('services.office365.redirect');
         $this->applicationId = config('services.office365.application_id');
         $this->applicationSecret = config('services.office365.application_secret');
-        $this->calendarProvider = $calendarProvider;
     }
 
     /**
@@ -71,7 +66,14 @@ class Office365
     public function redirect()
     {
         return new RedirectResponse(
-            $this->buildAuthURLFromBase($this->loginURL . $this->authorizeURL, \Session::get('state'))
+            $this->loginURL.$this->authorizeURL.'?'.
+            http_build_query([
+                'client_id' => $this->applicationId,
+                'redirect_uri' => $this->redirectURL,
+                'scope' => $this->formatScopes($this->graphScopes),
+                'response_type' => 'code',
+                'response_mode' => 'query'
+            ])
         );
     }
 
@@ -117,7 +119,7 @@ class Office365
                 "refresh_token" => $this->calendarProvider->refresh_token,
                 "grant_type" => "refresh_token",
                 "redirect_uri" => $this->redirectURL,
-                "scope" => $this->formatScopes($this->{$scopeType.'Scopes'}, $this->scopeSeparator)
+                "scope" => $this->formatScopes($this->{$scopeType.'Scopes'})
             ]
         ]);
 
@@ -165,104 +167,28 @@ class Office365
         foreach($response->value as $room) {
             $rooms[] = [
                 'name' => $room->Name,
-                'provider_calendar_id' => $room->Address,
+                'owner' => $room->Address,
             ];
         }
 
-        return $rooms;
+        $this->refreshToken();
 
+        return $rooms;
     }
 
     public function getRoomsCalendar($room)
     {
-        $calendars = [];
-
-        $users = $this->makeApiCall("GET", $this->graphApiURL . '/users');
-
-        foreach ($users->value as $user) {
-            if (
-                (
-                    str_contains(strtolower($user->displayName), 'desk') ||
-                    str_contains(strtolower($user->displayName), 'room')
-                )
-            ) {
-                dump($user);
-                try {
-                    foreach ($this->makeApiCall("GET",
-                        'https://graph.microsoft.com/v1.0/users/' . $user->userPrincipalName . '/calendars')->value as $calendar) {
-                        dd($calendar);
-                        $calendars[] = [
-                            'id' => $calendar->id,
-                            'name' => $calendar->name,
-                            'owner' => $user->userPrincipalName
-                        ];
-                    }
-                } catch (ClientException $e) {
-                    dd($e);
-                    continue;
-                }
-            }
-        }
-
-        dd($calendars);
-        return collect($calendars);
-
-        $this->refreshToken();
-        $calendars = [];
-
-        $users = $this->makeApiCall("GET", $this->graphApiURL . '/users');
-
-        foreach ($users->value as $user) {
-            if (
-                str_contains(strtolower($user->userPrincipalName), strtolower($room['provider_calendar_id']))
-            ) {
-                dump($user);
-                dd($this->makeApiCall( "GET", 'https://graph.microsoft.com/v1.0/users/' . $user->userPrincipalName . '/calendars'));
-            }
-        }
-
-        dd('here');
-
         try{
 
-            dd('https://graph.microsoft.com/v1.0/users/' . $room['provider_calendar_id'] . '/calendars');
-            $roomCalendars = $this->makeApiCall("GET", 'https://graph.microsoft.com/v1.0/users/' . $room['provider_calendar_id'] . '/calendars');
+            $roomCalendars = $this->makeApiCall("GET", 'https://graph.microsoft.com/v1.0/users/' . $room['owner'] . '/calendars');
 
-            dd($roomCalendars);
+            $room['id'] = $roomCalendars->value[0]->id;
 
-//                $calendars[] = [
-//                    'id' => $calendar->id,
-//                    'name' => $calendar->name,
-//                    'owner' => $user->userPrincipalName
-//                ];
+            return $room;
+
         }  catch (ClientException $e) {
             throw new InvalidCalendarRequest($e->getResponse()->getBody()->getContents());
         }
-    }
-
-    public function getCalendars($room)
-    {
-        try {
-            $calendars = $this->makeApiCall("GET", $this->graphApiURL.'/users/' . $room['provider_calendar_id'] . '/calendars');
-            dd($calendars);
-            foreach ($calendars->value as $calendar) {
-                $calendars[] = [
-                    'id' => $calendar->id,
-                    'name' => $calendar->name,
-                    'owner' => $room['provider_calendar_id']
-                ];
-            }
-        } catch (ClientException $e) {
-            throw new InvalidCalendarRequest($e->getResponse()->getBody()->getContents());
-        }
-
-        return $this->makeApiCall('get', $this->outlookApiURL.'/users/'.$room['provider_calendar_id'].'/calendars');
-    }
-
-
-    public function getCalendar($room)
-    {
-        dd($this->getCalendars($room));
     }
 
     /**
@@ -280,7 +206,6 @@ class Office365
         Carbon $endDateTime = null
     ) {
 
-        dd('nope need to chagne somse stuff');
         if (empty($startDateTime)) {
             $startDateTime = Carbon::now()->startOfDay();
         }
@@ -290,34 +215,17 @@ class Office365
         }
 
         try {
-            return $this->makeApiCall(
-                "GET",
-                $this->outlookApiURL.'/me/calendars/'.$calendar->provider_calendar_id.'/events?startDateTime=' . $startDateTime->format('Y-m-d\TH:i:s.0000000') . '&endDateTime=' . $endDateTime->format('Y-m-d\TH:i:s.0000000')
+            return $this->getPaginatedData(
+                $this->makeApiCall(
+                    "GET",
+                    $this->graphApiURL . '/users/' . $calendar->provider_calendar_owner . '/calendars/' . $calendar->provider_calendar_id . '/calendarView?startDateTime=' . $startDateTime->format('Y-m-d\TH:i:s.0000000') . '&endDateTime=' . $endDateTime->format('Y-m-d\TH:i:s.0000000')
+                )
             );
         } catch (ClientException $e) {
             throw new InvalidCalendarRequest($e->getResponse()->getBody()->getContents());
         }
     }
-//
-//    /**
-//     * Gets the calendars events based off a generated url
-//     * @param OfficeOauthToken $token
-//     * @param $url
-//     * @return mixed
-//     * @throws SpaceError
-//     */
-//    public function getCalendarEventsFromUrl(OfficeOauthToken $token, $url)
-//    {
-//        try {
-//            return $this->makeApiCall(
-//                $token,
-//                "GET",
-//                $url
-//            );
-//        } catch (ClientException $e) {
-//            throw new SpaceError($e->getResponse()->getBody()->getContents());
-//        }
-//    }
+
 //
 //    /**
 //     * Creates a calendar booking
@@ -468,6 +376,34 @@ class Office365
 //    }
 
     /**
+     * Gets the next set of paginated data based on a response from office365
+     * @param $response
+     * @param Collection $data
+     * @return mixed
+     * @throws InvalidCalendarRequest
+     */
+    private function getPaginatedData($response, Collection $data = null)
+    {
+        if(empty($data)) {
+            $data = collect();
+        }
+
+        foreach($response->value as $datum) {
+            $data->push($datum);
+        }
+
+        if (isset($eventObject->{"@odata.nextLink"})) {
+            try {
+                return $this->getPaginatedData($this->makeApiCall("GET", $response->{"@odata.nextLink"}), $data);
+            } catch (ClientException $e) {
+                throw new InvalidCalendarRequest($e->getResponse()->getBody()->getContents());
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Makes an API Call
      * @param $method
      * @param $url
@@ -510,44 +446,13 @@ class Office365
     }
 
     /**
-     * Get the authentication URL for the provider.
-     *
-     * @param  string $url
-     * @param  string $state
-     * @return string
-     */
-    private function buildAuthURLFromBase($url, $state)
-    {
-        return $url . '?' . http_build_query($this->getCodeFields($state));
-    }
-
-    /**
-     * Get the GET parameters for the code request.
-     *
-     * @return array
-     */
-    private function getCodeFields()
-    {
-        $fields = [
-            'client_id' => $this->applicationId,
-            'redirect_uri' => $this->redirectURL,
-            'scope' => $this->formatScopes($this->graphScopes, $this->scopeSeparator),
-            'response_type' => 'code',
-            'response_mode' => 'query'
-        ];
-
-        return array_merge($fields, $this->parameters);
-    }
-
-    /**
      * Format the given scopes.
      *
      * @param  array $scopes
-     * @param  string $scopeSeparator
      * @return string
      */
-    private function formatScopes(array $scopes, $scopeSeparator)
+    private function formatScopes(array $scopes)
     {
-        return implode($scopeSeparator, $scopes);
+        return implode(' ', $scopes);
     }
 }

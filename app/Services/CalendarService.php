@@ -49,10 +49,8 @@ class CalendarService implements CalendarServiceContract
         return $this->getProvider($provider)->getRoomsCalendar($room);
     }
 
-    public function getCalendarEvents($calendarId)
+    public function getCalendarEvents(Calendar $calendar)
     {
-        $calendar = Calendar::findOrFail($calendarId);
-
         return $this->getProvider($calendar->provider)->getCalendarEvents($calendar);
     }
 

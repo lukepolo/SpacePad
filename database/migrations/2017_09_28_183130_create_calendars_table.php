@@ -19,6 +19,8 @@ class CreateCalendarsTable extends Migration
             $table->integer('user_id');
             $table->string('provider');
             $table->string('provider_calendar_id');
+            $table->string('provider_calendar_name');
+            $table->string('provider_calendar_owner');
             $table->timestamps();
         });
     }
