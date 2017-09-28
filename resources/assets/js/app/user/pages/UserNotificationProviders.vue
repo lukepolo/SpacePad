@@ -1,0 +1,105 @@
+<template>
+
+   <section>
+       <div class="providers grid-4">
+           <label v-for="provider in notification_providers">
+               <div class="providers--item" @click="isConnected(provider.id) ? disconnectProvider(provider.id) : connectProvider(provider)">
+                   <div class="providers--item-header">
+                       <div class="providers--item-icon"><span :class="'icon-' + provider.name.toLowerCase()"></span></div>
+                       <div class="providers--item-name">{{provider.name}}</div>
+                   </div>
+                   <div class="providers--item-footer">
+                       <template v-if="isConnected(provider.id)">
+                           <div class="providers--item-footer-disconnect"><h4><span class="icon-check_circle"></span> Disconnect</h4></div>
+                       </template>
+                       <template v-else>
+                           <div class="providers--item-footer-connect">
+                               <h4><span class="icon-link"></span> Connect Account</h4>
+                           </div>
+                       </template>
+                   </div>
+               </div>
+           </label>
+       </div>
+
+       <div>
+           <form @submit.prevent="updateUserNotifications">
+               <template v-for="notification_setting in notification_settings">
+                   {{ notification_setting.name }} - <small>{{ notification_setting.description }}</small>
+                   <template v-for="service in notification_setting.services">
+                       <input :name="'notification_setting['+ notification_setting.id +']['+ service +']'" type="hidden" value="0">
+                       {{ service }} <input :name="'notification_setting['+ notification_setting.id +']['+ service +']'" type="checkbox" :checked="hasNotificationSetting(notification_setting, service)" value="1">
+                   </template>
+                   <br>
+               </template>
+               <button class="btn btn-primary" type="submit">Update Settings</button>
+           </form>
+       </div>
+   </section>
+
+</template>
+
+<script>
+    export default {
+        computed: {
+            notification_settings() {
+                return this.$store.state.notification_settings.settings
+            },
+            notification_providers() {
+                return this.$store.state.notification_providers.providers
+            },
+            user_notification_settings() {
+                return this.$store.state.user_notification_settings.settings
+            },
+            user_notification_providers() {
+                return this.$store.state.user_notification_providers.providers
+            },
+        },
+        methods: {
+            connectProvider(provider) {
+                window.location.replace(
+                    this.action('Auth\OauthController@newProvider', { provider : provider.provider_name})
+                )
+            },
+            hasNotificationSetting(notification_setting, service) {
+                let notification = _.find(this.user_notification_settings, {'notification_setting_id': notification_setting.id})
+
+                if(notification) {
+                    return _.indexOf(notification.services, service) !==  -1
+                }
+
+                return false
+
+            },
+            isConnected: function (notification_provider_id) {
+
+                if (_.some(this.user_notification_providers, {'notification_provider_id': notification_provider_id})) {
+                    return true
+                }
+
+                return false
+            },
+            disconnectProvider: function (notification_provider_id) {
+                let notification_provider = _.find(this.user_notification_providers, function (notification_provider) {
+                    return notification_provider.notification_provider_id === notification_provider_id
+                }).id
+
+                this.$store.dispatch('user_notification_providers/destroy', {
+                    user: this.$store.state.user.user.id,
+                    notification_provider: notification_provider
+                })
+            },
+            updateUserNotifications() {
+
+                this.$store.dispatch('user_notification_settings/update', this.getFormData(this.$el))
+            }
+        },
+        created() {
+            this.$store.dispatch('notification_providers/get')
+            this.$store.dispatch('user_notification_providers/get', this.$store.state.user.user.id)
+
+            this.$store.dispatch('notification_settings/get')
+            this.$store.dispatch('user_notification_settings/get')
+        },
+    }
+</script>
