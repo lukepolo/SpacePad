@@ -11,15 +11,28 @@
             </router-link>
         </template>
 
+        <h3>Rooms</h3>
+        <template v-for="room in rooms">
+            <div>
+                <router-link :to="{ name : 'room', params : { room : room.id }}">
+                    {{ room.name }}
+                </router-link>
+            </div>
+        </template>
+
     </div>
 </template>
 
 <script>
     export default {
         created() {
+            this.$store.dispatch('rooms/get')
             this.$store.dispatch('providers/get')
         },
         computed : {
+            rooms() {
+              return this.$store.state.rooms.rooms;
+            },
             providers() {
                 return this.$store.state.providers.providers
             }
