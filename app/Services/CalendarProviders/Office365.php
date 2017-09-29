@@ -152,6 +152,10 @@ class Office365
         return $calendarProvider;
     }
 
+    /**
+     * @return mixed
+     * @throws InvalidUserRequest
+     */
     public function getUserEmail()
     {
         try {
@@ -194,6 +198,11 @@ class Office365
 
     }
 
+    /**
+     * @param $roomOwner
+     * @return mixed
+     * @throws InvalidCalendarRequest
+     */
     public function getRoomsCalendar($roomOwner)
     {
         try{

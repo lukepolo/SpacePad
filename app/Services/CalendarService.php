@@ -20,6 +20,10 @@ class CalendarService implements CalendarServiceContract
 {
     const OFFICE365 = 'office365';
 
+    /**
+     * @param $roomProvider
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function authRedirect($roomProvider)
     {
         $roomProvider = RoomProvider::firstOrNew([
@@ -29,6 +33,11 @@ class CalendarService implements CalendarServiceContract
         return $this->getProvider($roomProvider)->redirect();
     }
 
+    /**
+     * @param $roomProvider
+     * @param Request $request
+     * @return mixed
+     */
     public function getToken($roomProvider, Request $request)
     {
         $roomProvider = RoomProvider::firstOrNew([
@@ -51,21 +60,38 @@ class CalendarService implements CalendarServiceContract
         return $roomProvider;
     }
 
+    /**
+     * @param RoomProvider $roomProvider
+     * @return mixed
+     */
     public function getUserEmail(RoomProvider $roomProvider)
     {
         return $this->getProvider($roomProvider)->getUserEmail();
     }
 
+    /**
+     * @param RoomProvider $roomProvider
+     * @return array
+     */
     public function getRooms(RoomProvider $roomProvider)
     {
         return $this->getProvider($roomProvider)->getRooms();
     }
 
+    /**
+     * @param RoomProvider $roomProvider
+     * @param $room
+     * @return mixed
+     */
     public function getRoomCalendar(RoomProvider $roomProvider, $room)
     {
         return $this->getProvider($roomProvider)->getRoomsCalendar($room);
     }
 
+    /**
+     * @param Room $room
+     * @return array
+     */
     public function getCalendarEvents(Room $room)
     {
         $events = [];
@@ -106,6 +132,11 @@ class CalendarService implements CalendarServiceContract
         return $events;
     }
 
+    /**
+     * @param RoomProvider $roomProvider
+     * @return Office365
+     * @throws InvalidProvider
+     */
     protected function getProvider(RoomProvider $roomProvider)
     {
         switch ($roomProvider->provider) {
