@@ -51,10 +51,6 @@ Route::get('/provider/{provider}/callback', 'Auth\OauthController@getHandleProvi
 
 Route::get('/', 'Controller@app');
 
-
-Route::get('/rooms', 'Controller@getRooms');
-Route::get('/calendars/{calendarId}', 'Controller@getCalendarEvents');
-
 Route::group([
     'middleware' => [
         'auth',

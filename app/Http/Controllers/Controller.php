@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\CalendarServiceContract as CalendarService;
-use App\Models\Calendar;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Contracts\CalendarServiceContract as CalendarService;
 
 class Controller extends BaseController
 {
@@ -23,7 +23,6 @@ class Controller extends BaseController
      */
     public function __construct(CalendarService $calendarService)
     {
-
         $this->calendarService = $calendarService;
     }
 
@@ -44,34 +43,6 @@ class Controller extends BaseController
         }
 
         return view('landing');
-    }
-
-    public function getRooms()
-    {
-        $provider = 'office365';
-
-        $rooms = $this->calendarService->getRooms($provider);
-
-        $calendar = $this->calendarService->getCalendar($provider, [
-            "name" => "Standing Desk",
-            "owner" => "lpolicinski@forcemed.com"
-        ]);
-
-        Calendar::firstOrCreate([
-            'provider' => $provider,
-            'name' => $calendar['name'],
-            'user_id' => auth()->user()->id,
-            'provider_calendar_id' => $calendar['id'],
-            'provider_calendar_name' => $calendar['name'],
-            'provider_calendar_owner' => $calendar['owner'],
-        ]);
-
-        return $rooms;
-    }
-
-    public function getCalendarEvents($calendarId)
-    {
-        dd();
     }
 
     /**

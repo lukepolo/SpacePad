@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Calendar;
 use Carbon\Carbon;
+use App\Models\Room;
+use App\Models\RoomEvent;
 use Illuminate\Http\Request;
-use App\Models\CalendarProvider;
+use App\Models\RoomProvider;
+use App\Models\EventAttendee;
 use App\Exceptions\InvalidProvider;
 use App\Contracts\CalendarServiceContract;
 use App\Services\CalendarProviders\Office365;
@@ -18,103 +20,101 @@ class CalendarService implements CalendarServiceContract
 {
     const OFFICE365 = 'office365';
 
-    public function authRedirect($provider) {
-        return $this->getProvider($provider)->redirect();
+    public function authRedirect($roomProvider)
+    {
+        $roomProvider = RoomProvider::firstOrNew([
+            'provider' => $roomProvider,
+        ]);
+
+        return $this->getProvider($roomProvider)->redirect();
     }
 
-    public function getToken($provider, Request $request) {
-        $tokenResponse = $this->getProvider($provider)->getToken($request);
-
-        $tokenModel = CalendarProvider::firstOrNew([
-            'provider' => $provider,
+    public function getToken($roomProvider, Request $request)
+    {
+        $roomProvider = RoomProvider::firstOrNew([
+            'provider' => $roomProvider,
             'user_id' => \Auth::user()->id,
         ]);
 
-        $tokenModel->fill([
+        $tokenResponse = $this->getProvider($roomProvider)->getToken($request);
+
+        $roomProvider->fill([
             'token' => $tokenResponse->access_token,
             'refresh_token' => $tokenResponse->refresh_token,
             'expires' => Carbon::now()->addSecond($tokenResponse->expires_in)
         ]);
 
-        $tokenModel->save();
+        $roomProvider->email = $this->getUserEmail($roomProvider);
+
+        $roomProvider->save();
+
+        return $roomProvider;
     }
 
-    public function getRooms($provider)
+    public function getUserEmail(RoomProvider $roomProvider)
     {
-        return $this->getProvider($provider)->getRooms();
+        return $this->getProvider($roomProvider)->getUserEmail();
     }
 
-    public function getCalendar($provider, $room)
+    public function getRooms(RoomProvider $roomProvider)
     {
-        return $this->getProvider($provider)->getRoomsCalendar($room);
+        return $this->getProvider($roomProvider)->getRooms();
     }
 
-    public function getCalendarEvents(Calendar $calendar)
+    public function getRoomCalendar(RoomProvider $roomProvider, $room)
     {
-        return $this->getProvider($calendar->provider)->getCalendarEvents($calendar);
+        return $this->getProvider($roomProvider)->getRoomsCalendar($room);
     }
 
-    private function getProvider($provider) {
+    public function getCalendarEvents(Room $room)
+    {
+        $events = [];
+        $tempEvents = $this->getProvider($room->roomProvider)->getCalendarEvents($room);
 
-        $calendarProvider = $this->getCalendarProvider($provider);
+        foreach($tempEvents as $event) {
 
-        switch($provider) {
+            $roomEvent = RoomEvent::firstOrNew([
+                'room_id' => $room->id,
+                'event_id' => $event['id']
+            ]);
+
+            $roomEvent->fill([
+                'link' => $event['link'],
+                'subject' => $event['subject'],
+                'end_date' => $event['end_date'],
+                'location' => $event['location'],
+                'organizer' => $event['organizer'],
+                'start_date' => $event['start_date'],
+                'organizer_email' => $event['organizer_email'],
+            ]);
+
+            $roomEvent->save();
+
+            foreach($event['attendees'] as $attendee) {
+                $eventAttendee = EventAttendee::firstOrCreate([
+                    'name' => $attendee['name'],
+                    'email' => $attendee['email'],
+                    'status' => $attendee['status'],
+                    'room_event_id' => $roomEvent->id,
+                ]);
+                $eventAttendee->save();
+            }
+
+            $events[] = $roomEvent->refresh();
+        }
+
+        return $events;
+    }
+
+    protected function getProvider(RoomProvider $roomProvider)
+    {
+        switch ($roomProvider->provider) {
             case self::OFFICE365 :
-                return new Office365($calendarProvider);
+                return new Office365($roomProvider);
                 break;
             default :
-                throw new InvalidProvider('We do not support '.$provider);
+                throw new InvalidProvider('We do not support ' . $roomProvider);
                 break;
         }
     }
-
-    private function getCalendarProvider($provider)
-    {
-        return CalendarProvider::where('user_id', auth()->user()->id)
-            ->where('provider', $provider)
-            ->first();
-    }
-
-//    /**
-//     * Saves an event
-//     *
-//     * @param Calendar $calendar
-//     * @param $event
-//     * @return mixed
-//     */
-//    public function saveEvent(Calendar $calendar, $event)
-//    {
-//        $eventModel = CalendarEvent::firstOrCreate([
-//            'event_id' => $event->id,
-//        ]);
-//
-//        $eventModel->fill([
-//            'calendar_id' => $calendar->id,
-//            'organizer' => $event->organizer->emailAddress->name,
-//            'organizer_email' => $event->organizer->emailAddress->address,
-//            'subject' => $event->subject,
-//            'start_date' => Carbon::parse($event->start->dateTime, $event->start->timeZone)->tz('UTC'),
-//            'end_date' => Carbon::parse($event->end->dateTime, $event->end->timeZone)->tz('UTC'),
-//            'location' => $event->location->displayName,
-//            'link' => $event->webLink,
-//        ]);
-//
-//        $eventModel->save();
-//
-//        foreach($event->attendees as $attendee) {
-//
-//            $eventAttendeeModel = EventAttendee::firstOrCreate([
-//                'calendar_event_id' => $eventModel->id,
-//                'name' => $attendee->emailAddress->name,
-//                'email'=> $attendee->emailAddress->address,
-//            ]);
-//
-//            $eventAttendeeModel->status = $attendee->status->response;
-//            $eventAttendeeModel->save();
-//        }
-//
-//        $eventModel->touch();
-//
-//        return $eventModel;
-//    }
 }

@@ -2,13 +2,15 @@
 
 namespace App\Services\CalendarProviders;
 
+use App\Models\Room;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
-use App\Models\Calendar;
 use Illuminate\Http\Request;
-use App\Models\CalendarProvider;
+use App\Models\RoomProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Http\RedirectResponse;
+use App\Exceptions\InvalidUserRequest;
+use App\Exceptions\InvalidRoomsRequest;
 use App\Exceptions\InvalidTokenRequest;
 use GuzzleHttp\Exception\ClientException;
 use App\Exceptions\InvalidCalendarRequest;
@@ -49,9 +51,9 @@ class Office365
 
     /**
      * Office365Service constructor.
-     * @param CalendarProvider|null $calendarProvider
+     * @param RoomProvider|null $calendarProvider
      */
-    public function __construct(CalendarProvider $calendarProvider = null)
+    public function __construct(RoomProvider $calendarProvider = null)
     {
         $this->calendarProvider = $calendarProvider;
         $this->redirectURL = config('services.office365.redirect');
@@ -138,10 +140,10 @@ class Office365
 
     /**
      * Checks to see if we need to refresh a token
-     * @param CalendarProvider $calendarProvider
-     * @return CalendarProvider
+     * @param RoomProvider $calendarProvider
+     * @return RoomProvider
      */
-    private function checkRefreshToken(CalendarProvider $calendarProvider)
+    private function checkRefreshToken(RoomProvider $calendarProvider)
     {
         if ($calendarProvider->isExpired()) {
             $this->refreshToken();
@@ -150,10 +152,21 @@ class Office365
         return $calendarProvider;
     }
 
+    public function getUserEmail()
+    {
+        try {
+            $response = $this->makeApiCall("GET", "$this->graphApiURL/me");
+        } catch (ClientException $e) {
+            throw new InvalidUserRequest($e->getResponse()->getBody()->getContents());
+        }
+
+        return $response->mail;
+    }
+
     /**
      * Gets all the calendars associated
      * @return array
-     * @throws InvalidCalendarRequest
+     * @throws InvalidRoomsRequest
      * @internal param bool $roomsOnly
      */
     public function getRooms()
@@ -162,30 +175,30 @@ class Office365
 
         $rooms = [];
 
-        $response = $this->makeApiCall("GET", "$this->outlookApiURL/me/findrooms");
+        try {
+            $response = $this->makeApiCall("GET", "$this->outlookApiURL/me/findrooms");
 
-        foreach($response->value as $room) {
-            $rooms[] = [
-                'name' => $room->Name,
-                'owner' => $room->Address,
-            ];
+            foreach($response->value as $room) {
+                $rooms[] = [
+                    'name' => $room->Name,
+                    'room' => $room->Address,
+                ];
+            }
+
+            $this->refreshToken();
+
+            return $rooms;
+        } catch (ClientException $e) {
+            throw new InvalidRoomsRequest($e->getResponse()->getBody()->getContents());
         }
 
-        $this->refreshToken();
-
-        return $rooms;
     }
 
-    public function getRoomsCalendar($room)
+    public function getRoomsCalendar($roomOwner)
     {
         try{
-
-            $roomCalendars = $this->makeApiCall("GET", 'https://graph.microsoft.com/v1.0/users/' . $room['owner'] . '/calendars');
-
-            $room['id'] = $roomCalendars->value[0]->id;
-
-            return $room;
-
+            $roomCalendars = $this->makeApiCall("GET", 'https://graph.microsoft.com/v1.0/users/' . $roomOwner . '/calendars');
+            return $roomCalendars->value[0]->id;
         }  catch (ClientException $e) {
             throw new InvalidCalendarRequest($e->getResponse()->getBody()->getContents());
         }
@@ -194,14 +207,14 @@ class Office365
     /**
      * Gets all the calendars event, given the calendar ID
      *
-     * @param Calendar $calendar
+     * @param Room $room
      * @param Carbon $startDateTime
      * @param Carbon $endDateTime
      * @return mixed
      * @throws InvalidCalendarRequest
      */
     public function getCalendarEvents(
-        Calendar $calendar,
+        Room $room,
         Carbon $startDateTime = null,
         Carbon $endDateTime = null
     ) {
@@ -218,9 +231,32 @@ class Office365
             return $this->getPaginatedData(
                 $this->makeApiCall(
                     "GET",
-                    $this->graphApiURL . '/users/' . $calendar->provider_calendar_owner . '/calendars/' . $calendar->provider_calendar_id . '/calendarView?startDateTime=' . $startDateTime->format('Y-m-d\TH:i:s.0000000') . '&endDateTime=' . $endDateTime->format('Y-m-d\TH:i:s.0000000')
+                    $this->graphApiURL . '/users/' . $room->provider_calendar_owner . '/calendars/' . $room->provider_calendar_id . '/calendarView?startDateTime=' . $startDateTime->format('Y-m-d\TH:i:s.0000000') . '&endDateTime=' . $endDateTime->format('Y-m-d\TH:i:s.0000000')
                 )
-            );
+            )->map(function($event) use($room) {
+                $eventData = [
+                    'attendees' => [],
+                    'id' => $event->id,
+                    'room_id' => $room->id,
+                    'link' => $event->webLink,
+                    'subject' => $event->subject,
+                    'location' => $event->location->displayName,
+                    'organizer' => $event->organizer->emailAddress->name,
+                    'organizer_email' => $event->organizer->emailAddress->address,
+                    'end_date' => Carbon::parse($event->end->dateTime, $event->end->timeZone)->tz('UTC'),
+                    'start_date' => Carbon::parse($event->start->dateTime, $event->start->timeZone)->tz('UTC'),
+                ];
+
+                foreach($event->attendees as $attendee) {
+                    $eventData['attendees'][] = [
+                        'name' => $attendee->emailAddress->name,
+                        'email'=> $attendee->emailAddress->address,
+                        'status' => $attendee->status->response
+                    ];
+                }
+
+                return $eventData;
+            });
         } catch (ClientException $e) {
             throw new InvalidCalendarRequest($e->getResponse()->getBody()->getContents());
         }
@@ -285,11 +321,11 @@ class Office365
 //     *
 //     * @param OfficeOauthToken $token
 //     * @param Space $space
-//     * @param CalendarEvent $event
+//     * @param RoomEvent $event
 //     * @return mixed
 //     * @throws SpaceError
 //     */
-//    public function endCalendarEvent(OfficeOauthToken $token, Space $space, CalendarEvent $event)
+//    public function endCalendarEvent(OfficeOauthToken $token, Space $space, RoomEvent $event)
 //    {
 //        $now = Carbon::now();
 //        try {
@@ -314,11 +350,11 @@ class Office365
 //     *
 //     * @param OfficeOauthToken $token
 //     * @param Space $space
-//     * @param CalendarEvent $event
+//     * @param RoomEvent $event
 //     * @return mixed
 //     * @throws SpaceError
 //     */
-//    public function startCalendarEvent(OfficeOauthToken $token, Space $space, CalendarEvent $event)
+//    public function startCalendarEvent(OfficeOauthToken $token, Space $space, RoomEvent $event)
 //    {
 //        $now = Carbon::now();
 //        try {
@@ -343,12 +379,12 @@ class Office365
 //     *
 //     * @param OfficeOauthToken $token
 //     * @param Space $space
-//     * @param CalendarEvent $event
+//     * @param RoomEvent $event
 //     * @param $minutes
 //     * @return mixed
 //     * @throws SpaceError
 //     */
-//    public function extendCalendarEvent(OfficeOauthToken $token, Space $space, CalendarEvent $event, $minutes)
+//    public function extendCalendarEvent(OfficeOauthToken $token, Space $space, RoomEvent $event, $minutes)
 //    {
 //        $startDateTime = $event->end_date->copy()->addSecond();
 //        $endDateTime = $event->end_date->addMinutes($minutes);

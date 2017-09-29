@@ -30,6 +30,6 @@ class User extends Authenticatable
 
     public function calendarProviders()
     {
-        return $this->hasMany(CalendarProvider::class);
+        return $this->hasMany(RoomProvider::class);
     }
 }

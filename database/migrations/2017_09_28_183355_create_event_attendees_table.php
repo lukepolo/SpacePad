@@ -15,7 +15,7 @@ class CreateEventAttendeesTable extends Migration
     {
         Schema::create('event_attendees', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('calendar_event_id');
+            $table->integer('room_event_id');
             $table->string('name');
             $table->string('email');
             $table->string('status');

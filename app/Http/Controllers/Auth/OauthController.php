@@ -33,6 +33,7 @@ class OauthController extends Controller
 
         $scopes = null;
 
+        // todo - set the session state here
         return $this->calendarService->authRedirect($provider);
     }
 
@@ -45,8 +46,9 @@ class OauthController extends Controller
      */
     public function getHandleProviderCallback(Request $request, $provider)
     {
-        $this->calendarService->getToken($provider, $request);
+        $roomProvider = $this->calendarService->getToken($provider, $request);
 
+        // TODO - redirect to room selection
         return redirect('/')->withSuccess("You have connected your $provider account");
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCalendarsTable extends Migration
+class CreateRoomProvidersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,14 @@ class CreateCalendarsTable extends Migration
      */
     public function up()
     {
-        Schema::create('calendars', function (Blueprint $table) {
+        Schema::create('room_providers', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
             $table->integer('user_id');
             $table->string('provider');
-            $table->string('provider_calendar_id');
-            $table->string('provider_calendar_name');
-            $table->string('provider_calendar_owner');
+            $table->string('email');
+            $table->longText('token');
+            $table->longText('refresh_token');
+            $table->dateTime('expires');
             $table->timestamps();
         });
     }
@@ -32,6 +32,6 @@ class CreateCalendarsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('calendars');
+        Schema::dropIfExists('room_providers');
     }
 }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CalendarEvent extends Model
+class Room extends Model
 {
     protected $guarded = [
         'id'
@@ -17,14 +17,19 @@ class CalendarEvent extends Model
      |
      */
 
-    public function calendar()
+    public function user()
     {
-        return $this->belongsTo(Calendar::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function attendees()
+    public function events()
     {
-        return $this->hasMany(EventAttendee::class);
+        return $this->hasMany(RoomEvent::class);
+    }
+
+    public function roomProvider()
+    {
+        return $this->belongsTo(RoomProvider::class);
     }
 
     /*
@@ -33,5 +38,4 @@ class CalendarEvent extends Model
      |--------------------------------------------------------------------------
      |
      */
-
 }

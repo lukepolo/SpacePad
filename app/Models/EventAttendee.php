@@ -18,7 +18,7 @@ class EventAttendee extends Model
      */
     public function event()
     {
-        return $this->belongsTo(CalendarEvent::class);
+        return $this->belongsTo(RoomEvent::class);
     }
 
     /*

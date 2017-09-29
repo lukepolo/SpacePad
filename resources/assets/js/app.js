@@ -8,6 +8,8 @@ require("./mixins");
 
 window.store = store;
 
+Vue.config.productionTip = false;
+
 const app = new Vue({
   store,
   router
