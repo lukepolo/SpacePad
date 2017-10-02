@@ -1,34 +1,93 @@
 <template>
-    <div>
-        <div class="tile is-ancestor">
-            <div class="tile is-vertical is-8">
-                <div class="tile">
-                    <div class="tile is-parent is-vertical">
-                        <article class="tile is-child box">
-                            <!-- Put any content you want -->
-                        </article>
-                        <article class="tile is-child box">
-                            <!-- Put any coclerntent you want -->
-                        </article>
-                    </div>
-                    <div class="tile is-parent">
-                        <article class="tile is-child box">
-                            <!-- Put any content you want -->
-                        </article>
+    <div v-if="room">
+        <div id="room-content">
+            <!-- Main container -->
+            <nav class="level">
+                <!-- Left side -->
+                <div class="level-left">
+                    <div class="level-item">
+                        <p class="subtitle is-5">
+                            {{ date }}
+                        </p>
                     </div>
                 </div>
-                <div class="tile is-parent">
-                    <article class="tile is-child box">
-                        <!-- Put any content you want -->
-                    </article>
+                <!-- Right side -->
+                <div class="level-right">
+                    <p class="level-item">{{ room.name }}</p>
                 </div>
-            </div>
-            <div class="tile is-parent">
-                <article class="tile is-child box">
-                    <!-- Put any content you want -->
-                </article>
+            </nav>
+            <div class="columns">
+                <div class="column is-two-thirds">
+                    <div class="level">
+                        <section class="hero">
+                            <div class="hero-body">
+                                <div class="container">
+                                    <h1 class="title">
+                                        <template v-if="currentBooking">
+                                            Booked until {{ formatTime(currentBooking.end_date) }}
+                                        </template>
+                                        <template v-else-if="nextBooking">
+                                            Next booking begins in 15 mins -- TODO
+                                        </template>
+                                        <template v-else>
+                                            Free
+                                        </template>
+                                    </h1>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="level">
+                        <div class="calendar">
+                          <div class="hour-container" v-for="hour in hours">
+                              <div class="hour">{{ hour.display }}</div>
+                          </div>
+                            <template v-for="booking in bookings">
+                                <div class="booking" :style="getTimeHeightStyle(booking.start_date, booking.end_date)">
+                                    {{ booking.subject }} : {{ formatTime(booking.start_date) }} - {{ formatTime(booking.end_date) }}
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="columns">
+                        <div class="column is-half button">
+                            Bookings
+                        </div>
+                        <div class="column is-half button">
+                            Attendees
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column" v-if="currentBooking">
+                            <template v-for="attendee in currentBooking.attendees">
+                                <div>
+                                    {status} - {{ attendee.name }}
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <footer>
+            <div class="level">
+                <!-- Left side -->
+                <div class="level-left">
+                    <div class="level-item">
+                       Release / (Check In / Start Early)
+                    </div>
+                </div>
+
+                <!-- Right side -->
+                <div class="level-right">
+                    <p class="level-item">
+                        Find Another space
+                    </p>
+                </div>
+            </div>
+        </footer>
     </div>
 </template>
 
@@ -37,14 +96,41 @@
         created() {
             this.$store.dispatch('rooms/show', this.$route.params.room);
             this.$store.dispatch('rooms/events/get', this.$route.params.room)
+
+            let hour = 0;
+            while(hour < 24) {
+                this.hours.push({
+                    'display' : hour,
+                    'events' : []
+                });
+                hour = hour + 1;
+            }
+        },
+        data() {
+            return {
+                hours : []
+            }
         },
         methods: {},
         computed: {
+            date() {
+              return moment().format('lll')
+            },
             room() {
                 return this.$store.state.rooms.room;
             },
-            events() {
+            bookings() {
                 return this.$store.state.rooms.events.events;
+            },
+            currentBooking() {
+                return _.find(this.bookings, (booking) => {
+                    return this.parseDate(booking.start_date).isBefore(this.now()) && this.parseDate(booking.end_date).isAfter(this.now());
+                })
+            },
+            nextBooking() {
+                return _.find(this.bookings, (booking) => {
+                    return this.parseDate(booking.start_date).isAfter(this.now());
+                })
             }
         }
     }

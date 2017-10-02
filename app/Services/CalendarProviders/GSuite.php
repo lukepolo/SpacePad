@@ -182,8 +182,8 @@ class GSuite
                     'location' => $event->getLocation(),
                     'organizer' => $event->getOrganizer()->getDisplayName(),
                     'organizer_email' => $event->getOrganizer()->getEmail(),
-                    'end_date' => Carbon::parse($event->getStart()->dateTime, $event->getStart()->timeZone)->tz('UTC'),
-                    'start_date' => Carbon::parse($event->getEnd()->dateTime, $event->getEnd()->timeZone)->tz('UTC'),
+                    'end_date' => Carbon::parse($event->getEnd()->dateTime, $event->getEnd()->timeZone)->tz('UTC'),
+                    'start_date' => Carbon::parse($event->getStart()->dateTime, $event->getStart()->timeZone)->tz('UTC'),
                 ];
 
                 /** @var \Google_Service_Calendar_EventAttendee $attendee */

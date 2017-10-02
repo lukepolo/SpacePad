@@ -1,1 +1,13 @@
 @import '~bulma';
+
+@import "modules/calendar";
+
+#main > div {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+#room-content {
+  flex: 1;
+}

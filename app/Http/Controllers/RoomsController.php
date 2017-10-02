@@ -21,14 +21,11 @@ class RoomsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  Room $room
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($room)
     {
-        // TODO - not sure why its return an array.....?
-        return response()->json(
-            Room::where('user_id', auth()->user()->id)->findOrFail($id)[0]
-        );
+        return response()->json($room);
     }
 }

@@ -31,7 +31,6 @@
     </head>
     <body>
         <div id="app-layout">
-            <navigation></navigation>
             <div id="main">
                 @yield('content')
             </div>
