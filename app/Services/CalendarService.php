@@ -47,12 +47,12 @@ class CalendarService implements CalendarServiceContract
             'user_id' => \Auth::user()->id,
         ]);
 
-        $tokenResponse = $this->getProvider($roomProvider)->getToken($request);
+        $token = $this->getProvider($roomProvider)->getToken($request);
 
         $roomProvider->fill([
-            'token' => $tokenResponse['access_token'],
-            'refresh_token' => isset($tokenResponse['refresh_token']) ? $tokenResponse['refresh_token'] : null,
-            'expires' => Carbon::now()->addSecond($tokenResponse['expires_in'])
+            'token' => $token['access_token'],
+            'refresh_token' => $token['refresh_token'],
+            'expires' => Carbon::now()->addSecond($token['expires_in'])
         ]);
 
         $roomProvider->email = $this->getUserEmail($roomProvider);

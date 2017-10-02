@@ -5,11 +5,11 @@ namespace App\Services\CalendarProviders;
 use App\Models\Room;
 use Carbon\Carbon;
 use Google_Client;
-use Google_Service_Calendar;
-use Google_Service_Exception;
 use Google_Service_Oauth2;
+use Google_Service_Calendar;
 use Illuminate\Http\Request;
 use App\Models\RoomProvider;
+use Google_Service_Exception;
 use App\Exceptions\InvalidUserRequest;
 use App\Exceptions\InvalidRoomsRequest;
 use App\Exceptions\InvalidTokenRequest;
@@ -39,10 +39,10 @@ class GSuite
     public function __construct(RoomProvider $calendarProvider = null)
     {
         $client = new Google_Client();
-        $client->setAccessType("offline");
-        $client->setApplicationName("Client_Library_Examples");
-        $client->setDeveloperKey(config('services.gsuite.client_id'));
-        $client->setAuthConfig(storage_path('app/credentials/gsuite.json'));
+        $client->setAccessType('offline');
+        $client->setApprovalPrompt ("force");
+        $client->setClientId(config('services.gsuite.client_id'));
+        $client->setClientSecret(config('services.gsuite.client_secret'));
         $client->addScope(Google_Service_Calendar::CALENDAR);
         $client->addScope(Google_Service_Oauth2::USERINFO_EMAIL);
         $client->setRedirectUri(config('services.gsuite.redirect'));
@@ -50,7 +50,11 @@ class GSuite
         $this->client = $client;
         $this->calendarProvider = $calendarProvider;
         if(isset($this->calendarProvider->token)) {
-            $this->setAccessToken($this->calendarProvider->token);
+            $this->setAccessToken([
+                'access_token' => $this->calendarProvider->token,
+                'refresh_token' => $this->calendarProvider->refresh_token,
+                'expires_in' => $this->calendarProvider->expires->diffInSeconds()
+            ]);
         }
     }
 
@@ -72,49 +76,10 @@ class GSuite
     public function getToken(Request $request)
     {
         try {
-            $tokenData = $this->client->fetchAccessTokenWithAuthCode($request->get('code'));
-
-            $this->setAccessToken($tokenData['access_token']);
-
-            return $tokenData;
+            return $this->setAccessToken($this->client->fetchAccessTokenWithAuthCode($request->get('code')));
         } catch (Google_Service_Exception $e) {
             throw new InvalidTokenRequest($e->getMessage());
         }
-    }
-
-    /**
-     * Refreshse a token based on its type
-     *
-     * @return mixed
-     * @throws InvalidTokenRequest
-     */
-    public function refreshToken()
-    {
-//        try {
-//
-//        } catch (Google_Service_Exception $e) {
-//            throw new InvalidTokenRequest($e->getResponse()->getBody()->getContents());
-//        }
-//
-//        $this->calendarProvider->update([
-//            'token' => $tokenData->access_token,
-//            'refresh_token' => $tokenData->refresh_token,
-//            'expires' => Carbon::now()->addSecond($tokenData->expires_in)
-//        ]);
-    }
-
-    /**
-     * Checks to see if we need to refresh a token
-     * @param RoomProvider $calendarProvider
-     * @return RoomProvider
-     */
-    private function checkRefreshToken(RoomProvider $calendarProvider)
-    {
-        if ($calendarProvider->isExpired()) {
-            $this->refreshToken();
-        }
-
-        return $calendarProvider;
     }
 
     /**
@@ -141,7 +106,9 @@ class GSuite
         $rooms = [];
 
         try {
-            $calendarList = $this->googleCalendarService->calendarList->listCalendarList();
+            $calendarList = $this->googleCalendarService->calendarList->listCalendarList([
+                'maxResults' => 250
+            ]);
 
             /** @var \Google_Service_Calendar_CalendarListEntry $room */
             foreach($calendarList->getItems() as $room) {
@@ -199,9 +166,11 @@ class GSuite
             $eventsList = $this->googleCalendarService->events->listEvents($room->provider_calendar_id, [
                 'timeMin' => $startDateTime->toRfc3339String(),
                 'timeMax' => $endDateTime->toRfc3339String(),
+                'maxResults' => 1440
             ]);
 
             $events = [];
+
             /** @var \Google_Service_Calendar_Event $event */
             foreach($eventsList->getItems() as $event) {
                 $eventData = [
@@ -237,12 +206,15 @@ class GSuite
 
     /**
      * @param $token
+     * @return mixed
      */
     protected function setAccessToken($token)
     {
         $this->googleOAuthService = new Google_Service_Oauth2($this->client);
         $this->googleCalendarService = new Google_Service_Calendar($this->client);
         $this->client->setAccessToken($token);
+
+        return $token;
     }
 
 }
