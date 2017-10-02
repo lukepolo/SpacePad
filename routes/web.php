@@ -39,8 +39,8 @@ Auth::routes();
 |--------------------------------------------------------------------------
 |
 */
-Route::get('/provider/{provider}/link', 'Auth\OauthController@newProvider');
-Route::get('/provider/{provider}/callback', 'Auth\OauthController@getHandleProviderCallback');
+Route::get('/provider/{providerName}/link', 'Auth\OauthController@newProvider');
+Route::get('/provider/{providerName}/callback', 'Auth\OauthController@getHandleProviderCallback');
 
 /*
 |--------------------------------------------------------------------------
