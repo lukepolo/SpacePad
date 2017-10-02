@@ -196,7 +196,10 @@ class GSuite
         try {
 
             /** @var \Google_Service_Calendar_Events $events */
-            $eventsList = $this->googleCalendarService->events->listEvents($room->provider_calendar_id);
+            $eventsList = $this->googleCalendarService->events->listEvents($room->provider_calendar_id, [
+                'timeMin' => $startDateTime->toRfc3339String(),
+                'timeMax' => $endDateTime->toRfc3339String(),
+            ]);
 
             $events = [];
             /** @var \Google_Service_Calendar_Event $event */

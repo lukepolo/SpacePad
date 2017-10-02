@@ -119,12 +119,16 @@ class CalendarService implements CalendarServiceContract
             $roomEvent->save();
 
             foreach($event['attendees'] as $attendee) {
-                $eventAttendee = EventAttendee::firstOrCreate([
-                    'name' => $attendee['name'],
+                $eventAttendee = EventAttendee::firstOrNew([
                     'email' => $attendee['email'],
-                    'status' => $attendee['status'],
                     'room_event_id' => $roomEvent->id,
                 ]);
+
+                $eventAttendee->fill([
+                    'name' => $attendee['name'],
+                    'status' => $attendee['status'],
+                ]);
+
                 $eventAttendee->save();
             }
 
