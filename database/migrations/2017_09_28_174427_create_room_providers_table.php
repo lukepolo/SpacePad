@@ -19,7 +19,7 @@ class CreateRoomProvidersTable extends Migration
             $table->string('provider');
             $table->string('email');
             $table->longText('token');
-            $table->longText('refresh_token');
+            $table->longText('refresh_token')->nullable();
             $table->dateTime('expires');
             $table->timestamps();
         });

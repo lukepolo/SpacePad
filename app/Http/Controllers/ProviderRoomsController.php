@@ -45,7 +45,7 @@ class ProviderRoomsController extends Controller
         $room = $request->get('room');
 
         // TODO - temp , i dont have access
-        $room = 'lpolicinski@forcemed.com';
+//        $room = 'lpolicinski@forcemed.com';
 
         return response()->json(
             Room::firstOrCreate([

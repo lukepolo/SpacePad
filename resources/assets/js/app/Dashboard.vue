@@ -3,6 +3,7 @@
         Lets connect your first provider
 
         <a href="/provider/office365/link">Office 365</a>
+        <a href="/provider/gsuite/link">GSuite</a>
 
         <h3>Connected Accounts</h3>
         <template v-for="provider in providers">

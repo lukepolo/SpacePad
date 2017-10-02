@@ -10,6 +10,7 @@ use App\Models\RoomProvider;
 use App\Models\EventAttendee;
 use App\Exceptions\InvalidProvider;
 use App\Contracts\CalendarServiceContract;
+use App\Services\CalendarProviders\GSuite;
 use App\Services\CalendarProviders\Office365;
 
 /**
@@ -19,18 +20,19 @@ use App\Services\CalendarProviders\Office365;
 class CalendarService implements CalendarServiceContract
 {
     const OFFICE365 = 'office365';
+    const GSUITE = 'gsuite';
 
     /**
      * @param $roomProvider
-     * @return \Illuminate\Http\RedirectResponse
+     * @return string
      */
-    public function authRedirect($roomProvider)
+    public function redirectUrl($roomProvider)
     {
         $roomProvider = RoomProvider::firstOrNew([
             'provider' => $roomProvider,
         ]);
 
-        return $this->getProvider($roomProvider)->redirect();
+        return $this->getProvider($roomProvider)->redirectUrl();
     }
 
     /**
@@ -48,9 +50,9 @@ class CalendarService implements CalendarServiceContract
         $tokenResponse = $this->getProvider($roomProvider)->getToken($request);
 
         $roomProvider->fill([
-            'token' => $tokenResponse->access_token,
-            'refresh_token' => $tokenResponse->refresh_token,
-            'expires' => Carbon::now()->addSecond($tokenResponse->expires_in)
+            'token' => $tokenResponse['access_token'],
+            'refresh_token' => isset($tokenResponse['refresh_token']) ? $tokenResponse['refresh_token'] : null,
+            'expires' => Carbon::now()->addSecond($tokenResponse['expires_in'])
         ]);
 
         $roomProvider->email = $this->getUserEmail($roomProvider);
@@ -134,12 +136,15 @@ class CalendarService implements CalendarServiceContract
 
     /**
      * @param RoomProvider $roomProvider
-     * @return Office365
+     * @return Office365 | GSuite
      * @throws InvalidProvider
      */
     protected function getProvider(RoomProvider $roomProvider)
     {
         switch ($roomProvider->provider) {
+            case self::GSUITE :
+                return new GSuite($roomProvider);
+                break;
             case self::OFFICE365 :
                 return new Office365($roomProvider);
                 break;

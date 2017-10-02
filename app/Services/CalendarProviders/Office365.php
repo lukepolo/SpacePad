@@ -63,20 +63,17 @@ class Office365
 
     /**
      * Redirects the user so they can use oAuth
-     * @return RedirectResponse
      */
-    public function redirect()
+    public function redirectUrl()
     {
-        return new RedirectResponse(
-            $this->loginURL.$this->authorizeURL.'?'.
+        return $this->loginURL.$this->authorizeURL.'?'.
             http_build_query([
                 'client_id' => $this->applicationId,
                 'redirect_uri' => $this->redirectURL,
                 'scope' => $this->formatScopes($this->graphScopes),
                 'response_type' => 'code',
                 'response_mode' => 'query'
-            ])
-        );
+            ]);
     }
 
     /**
@@ -99,7 +96,7 @@ class Office365
         ]);
 
         try {
-            return json_decode($client->post($this->loginURL . $this->tokenURL)->getBody()->getContents());
+            return json_decode($client->post($this->loginURL . $this->tokenURL)->getBody()->getContents(), true);
         } catch (ClientException $e) {
             throw new InvalidTokenRequest($e->getResponse()->getBody()->getContents());
         }

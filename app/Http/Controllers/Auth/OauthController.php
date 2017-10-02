@@ -32,7 +32,7 @@ class OauthController extends Controller
         Session::put('url.intended', $request->headers->get('referer'));
 
         // todo - set the session state here
-        return $this->calendarService->authRedirect($provider);
+        return redirect($this->calendarService->redirectUrl($provider));
     }
 
     /**
@@ -45,11 +45,10 @@ class OauthController extends Controller
     public function getHandleProviderCallback(Request $request, $provider)
     {
         try {
-            $roomProvider = $this->calendarService->getToken($provider, $request);
+            $this->calendarService->getToken($provider, $request);
         } catch(\Exception $e) {
             return redirect('/')->withErrors('Sorry, we had an error');
         }
-
 
         // TODO - redirect to room selection
         return redirect('/')->withSuccess("You have connected your $provider account");

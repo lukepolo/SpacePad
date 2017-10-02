@@ -22,7 +22,7 @@ class CreateRoomEventsTable extends Migration
             $table->string('subject');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->string('location');
+            $table->string('location')->nullable();
             $table->longText('link');
             $table->timestamps();
         });
