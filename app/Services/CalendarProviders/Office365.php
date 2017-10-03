@@ -39,13 +39,13 @@ class Office365
 
     protected $graphScopes = [
         'https://graph.microsoft.com/User.ReadBasic.All',
-        'https://graph.microsoft.com/Calendars.ReadWrite',
+        'https://graph.microsoft.com/Calendars.ReadWrite.Shared',
         'offline_access',
     ];
 
     protected $outlookScopes = [
         'https://outlook.office.com/User.ReadBasic.All',
-        'https://outlook.office.com/Calendars.ReadWrite',
+        'https://outlook.office.com/Calendars.ReadWrite.Shared',
         'offline_access',
     ];
 
@@ -254,10 +254,20 @@ class Office365
                 ];
 
                 foreach($event->attendees as $attendee) {
+
+                    $status = $attendee->status->response;
+                    switch(strtolower($attendee->status->response)) {
+                        case 'none' :
+                            $status = 'needsAction';
+                            break;
+//                            accepted
+                    // declined
+                    }
+
                     $eventData['attendees'][] = [
                         'name' => $attendee->emailAddress->name,
                         'email'=> $attendee->emailAddress->address,
-                        'status' => $attendee->status->response
+                        'status' => $status
                     ];
                 }
 
