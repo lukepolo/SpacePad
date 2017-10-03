@@ -56,9 +56,8 @@
         </header>
 
         <div id="content">
-            <div id="main">
-                @yield('content')
-            </div>
+
+            @yield('content')
 
             <footer class="footer">
                 <div class="footer--links">

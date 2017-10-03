@@ -31,9 +31,7 @@
     </head>
     <body>
         <div id="app-layout">
-            <div id="main">
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
 
         @stack('scripts')

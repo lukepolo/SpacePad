@@ -2,12 +2,9 @@
 
 @import "modules/calendar";
 
-#main > div {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-#room-content {
-  flex: 1;
+html, body, #app-layout, #room, #room-content {
+  height : 100%;
+  min-height: 100%;
+  margin: 0px;
+  padding: 0px;
 }

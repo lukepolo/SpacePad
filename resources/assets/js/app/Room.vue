@@ -1,8 +1,8 @@
 <template>
-    <div v-if="room">
+    <div id="room" v-if="room">
         <div id="room-content">
-            <!-- Main container -->
-            <nav class="level">
+
+            <nav class="room-header level">
                 <!-- Left side -->
                 <div class="level-left">
                     <div class="level-item">
@@ -16,28 +16,25 @@
                     <p class="level-item">{{ room.name }}</p>
                 </div>
             </nav>
-            <div class="columns">
-                <div class="column is-two-thirds">
-                    <div class="level">
-                        <section class="hero">
-                            <div class="hero-body">
-                                <div class="container">
-                                    <h1 class="title">
-                                        <template v-if="currentBooking">
-                                            Booked until {{ formatTime(currentBooking.end_date) }}
-                                        </template>
-                                        <template v-else-if="nextBooking">
-                                            Next booking begins in 15 mins -- TODO
-                                        </template>
-                                        <template v-else>
-                                            Free
-                                        </template>
-                                    </h1>
-                                </div>
-                            </div>
-                        </section>
+
+            <!--content -->
+            <div class="columns room-details">
+
+                <div class="column calendar-wrapper">
+                    <div class="level booking-status">
+                       <div class="level-item">
+                           <template v-if="currentBooking">
+                               Booked until {{ formatTime(currentBooking.end_date) }}
+                           </template>
+                           <template v-else-if="nextBooking">
+                               Next booking begins in 15 mins -- TODO
+                           </template>
+                           <template v-else>
+                               Free
+                           </template>
+                       </div>
                     </div>
-                    <div class="level">
+                    <div class="level bookings">
                         <div class="calendar">
                           <div class="hour-container" v-for="hour in hours">
                               <div class="hour">{{ hour.display }}</div>
@@ -50,44 +47,47 @@
                         </div>
                     </div>
                 </div>
-                <div class="column">
-                    <div class="columns">
-                        <div class="column is-half button">
+
+                <div class="column tabs">
+                    <div class="tab-buttons">
+                        <div class="button">
                             Bookings
                         </div>
-                        <div class="column is-half button">
+                        <div class="button">
                             Attendees
                         </div>
                     </div>
-                    <div class="columns">
-                        <div class="column" v-if="currentBooking">
+                    <div class="tab-content">
+                        <template v-if="currentBooking">
                             <template v-for="attendee in currentBooking.attendees">
                                 <div>
                                     {status} - {{ attendee.name }}
                                 </div>
                             </template>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="room-footer">
+                <div class="level">
+                    <!-- Left side -->
+                    <div class="level-left">
+                        <div class="level-item">
+                            Release / (Check In / Start Early)
                         </div>
+                    </div>
+
+                    <!-- Right side -->
+                    <div class="level-right">
+                        <p class="level-item">
+                            Find Another space
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-        <footer>
-            <div class="level">
-                <!-- Left side -->
-                <div class="level-left">
-                    <div class="level-item">
-                       Release / (Check In / Start Early)
-                    </div>
-                </div>
-
-                <!-- Right side -->
-                <div class="level-right">
-                    <p class="level-item">
-                        Find Another space
-                    </p>
-                </div>
-            </div>
-        </footer>
     </div>
 </template>
 

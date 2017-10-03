@@ -1,22 +1,77 @@
 .calendar {
   position: relative;
+  overflow : auto;
   width: 100%;
-  overflow-y: auto;
   .hour-container {
     width: 100%;
     height : 6em;
     color : lightgrey;
     border-top: 1px solid lightgray;
-
+    margin-left: 40px;
     .hour {
       position: relative;
       top: -12px;
+      left : -20px;
     }
   }
 
   .booking {
+    background-color :red;
     position : absolute;
-    background-color : red;
     left : 30px;
+  }
+}
+
+#room-content {
+  display: flex;
+  flex-direction: column;
+
+  .room-header {
+    flex: 0 0 auto;
+  }
+
+  .room-details {
+    flex: 1 1 auto;
+    display: flex;
+
+    .calendar-wrapper {
+      flex: 1 1 1em;
+      overflow-y: auto;
+      display: flex;
+      flex-direction:column;
+      .booking-status {
+        flex: 0 0 auto;
+      }
+
+      .bookings {
+        flex: 1 1 auto;
+        overflow-y : auto;
+      }
+    }
+
+    .tabs {
+      display: flex;
+      flex-direction: column;
+      .tab-buttons {
+        flex: 0 0 auto;
+        display: flex;
+        .button {
+          flex : 1 1 1em;
+        }
+      }
+
+      .tab-content {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        display: flex;
+        flex-direction:column;
+      }
+
+    }
+
+  }
+
+  .room-footer {
+    flex: 0 0 auto;
   }
 }

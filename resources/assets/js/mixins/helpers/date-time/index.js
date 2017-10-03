@@ -17,16 +17,10 @@ export const formatTime = (date) => {
 export const getTimeHeightStyle = (startDate, endDate) => {
 
     let startDateParsed = parseDate(startDate);
-    let startDateParsedHours = startDateParsed.format('HH') * 6;
-    let startDateParsedMinutes = startDateParsed.format('mm');
+    let startEM = ((((startDateParsed.format('HH') * 60) + parseInt(startDateParsed.format('mm')))) * 6) / 60;
 
     let endDateParsed = parseDate(endDate);
-    let endDateParsedHours = (endDateParsed.format('HH') * 6) - startDateParsedHours;
-    let endDateParsedMinutes = endDateParsed.format('mm');
+    let endEm = (((((endDateParsed.format('HH') * 60) + parseInt(endDateParsed.format('mm')))) * 6) / 60) - startEM;
 
-    // todo - n eed to convert to percetnage then * by 6
-    console.info(
-        `top:${startDateParsedHours}.${startDateParsedMinutes}em; height:${endDateParsedHours}.${endDateParsedMinutes}em;`
-    )
-    return `top:${startDateParsedHours}.${startDateParsedMinutes}em; height:${endDateParsedHours}.${endDateParsedMinutes}em;`;
+    return `top:${startEM }em; height:${endEm }em;`;
 }
