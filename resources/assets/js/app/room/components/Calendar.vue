@@ -69,7 +69,7 @@
                 calendar.scrollTop = 0;
                 let calendarOffsets = this.getOffset(calendar)
                 let currentTimeOffsets = this.getOffset(this.$refs['current-time-container']);
-                calendar.scrollTop = (currentTimeOffsets.top - calendarOffsets.top) - 100;
+                calendar.scrollTop = (currentTimeOffsets.top - calendarOffsets.top) - 125;
             },
             getCurrentTimeStyles() {
                 let now = this.now();
