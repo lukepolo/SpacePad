@@ -40,8 +40,8 @@ mix
     .version()
     .browserSync({
         open: "external",
-        host: "spacepad.dev",
-        proxy: "spacepad.dev",
+        host: "space-pad.dev",
+        proxy: "space-pad.dev",
         files: [
             "resources/views/**/*.php",
             "public/js/**/*.js",

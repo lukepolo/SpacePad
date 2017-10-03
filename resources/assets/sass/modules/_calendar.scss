@@ -7,18 +7,23 @@
     height : 6em;
     color : lightgrey;
     border-top: 1px solid lightgray;
-    margin-left: 40px;
+    margin-left: 70px;
     .hour {
+      color : darken(lightgrey, 10%);
       position: relative;
       top: -12px;
-      left : -20px;
+      left : -50px;
     }
   }
 
   .booking {
-    background-color :red;
+    border-left : 3px solid #48ACF0;
+    background-color : rgba(mix(#48ACF0, #FFFFFF, 20%), .9);
     position : absolute;
-    left : 30px;
+    left : 70px;
+    width: 100%;
+    padding-left : 5px;
+    cursor: pointer;
   }
 }
 
