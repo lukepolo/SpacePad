@@ -129,6 +129,10 @@ class CalendarService implements CalendarServiceContract
                     'status' => $attendee['status'],
                 ]);
 
+                if(empty($eventAttendee->name)) {
+                    $eventAttendee->name = $eventAttendee->email;
+                }
+
                 $eventAttendee->save();
             }
 

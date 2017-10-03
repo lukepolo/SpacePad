@@ -1,5 +1,10 @@
 @import '~bulma';
 
+$white:                         #FFFFFF;
+$black:                         #2B2B2B;
+$gray:                          #3C3F41;
+$grayLight:                     #B6B6B6;
+
 $blue:                          #48ACF0;
 $red:                           #F4645F;
 $green:                         #83B692;
@@ -12,6 +17,8 @@ html, body, #app-layout, #room, #room-content {
   min-height: 100%;
   margin: 0;
   padding: 0;
+  //background-color : $black;
+  //color : $white;
 }
 
 h1 {

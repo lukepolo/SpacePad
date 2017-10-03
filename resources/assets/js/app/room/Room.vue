@@ -2,7 +2,7 @@
     <div id="room" v-if="room">
         <div id="room-content">
 
-            <nav class="room-header level">
+            <nav class="room-header level" :class="{ booked : currentBooking , free : !currentBooking}">
                 <!-- Left side -->
                 <div class="level-left">
                     <h2>{{ room.name }}</h2>
@@ -17,7 +17,17 @@
             <div class="columns room-details">
 
                 <div class="column calendar-wrapper">
-                    <room-status></room-status>
+                    <div class="booking-status">
+                        <template v-if="currentBooking">
+                            <h1>Booked until {{ formatTime(currentBooking.end_date) }}</h1>
+                        </template>
+                        <template v-else-if="nextBooking">
+                            <h1>Booked in {{ humanizeDiff(now(), parseDate(nextBooking.start_date)) }} </h1>
+                        </template>
+                        <template v-else>
+                            <h1>Free</h1>
+                        </template>
+                    </div>
                     <calendar></calendar>
                 </div>
 
@@ -31,7 +41,7 @@
 
             </div>
 
-            <div class="room-footer">
+            <div class="room-footer" :class="{ booked : currentBooking , free : !currentBooking}">
                 <div class="level">
                     <!-- Left side -->
                     <div class="level-left">
@@ -54,13 +64,11 @@
 
 <script>
     import Calendar from './components/Calendar.vue';
-    import RoomStatus from './components/RoomStatus.vue';
     import BookingAttendees from './components/BookingAttendees.vue';
 
     export default {
         components : {
             Calendar,
-            RoomStatus,
             BookingAttendees,
         },
         created() {
@@ -76,6 +84,19 @@
             },
             selectedBooking() {
                 return this.$store.state.rooms.events.event;
+            },
+            bookings() {
+                return this.$store.state.rooms.events.events;
+            },
+            currentBooking() {
+                return _.find(this.bookings, (booking) => {
+                    return this.parseDate(booking.start_date).isBefore(this.now()) && this.parseDate(booking.end_date).isAfter(this.now());
+                })
+            },
+            nextBooking() {
+                return _.find(this.bookings, (booking) => {
+                    return this.parseDate(booking.start_date).isAfter(this.now());
+                })
             }
         }
     }
