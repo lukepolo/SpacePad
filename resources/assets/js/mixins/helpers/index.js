@@ -2,7 +2,7 @@ import { createForm, getFormData } from "./form";
 
 import { back, action } from "./routes";
 
-import { now, diff, parseDate, formatTime, getTimeHeightStyle } from "./date-time";
+import { now, humanizeDiff, parseDate, formatTime, getTimeHeightStyle } from "./date-time";
 
 import { local } from "./environment";
 
@@ -14,7 +14,7 @@ Vue.mixin({
   methods: {
     now,
     back,
-    diff,
+    humanizeDiff,
     action,
     showError,
     parseDate,

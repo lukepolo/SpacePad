@@ -6,8 +6,8 @@ export const parseDate = date => {
   return moment(date).tz(moment.tz.guess());
 };
 
-export const diff = (date1, date2) => {
-  return moment(date2).preciseDiff(moment(date1));
+export const humanizeDiff = (date1, date2) => {
+  return moment.duration(moment(date2).diff(moment(date1), 'minutes'), "minutes").humanize();
 };
 
 export const formatTime = (date) => {

@@ -1,13 +1,13 @@
 <template>
     <div>
         <template v-if="currentBooking">
-            Booked until {{ formatTime(currentBooking.end_date) }}
+            <h1>Booked until {{ formatTime(currentBooking.end_date) }}</h1>
         </template>
         <template v-else-if="nextBooking">
-            Next booking begins in 15 mins -- TODO
+            <h1>Booked in {{ humanizeDiff(now(), parseDate(nextBooking.start_date)) }} </h1>
         </template>
         <template v-else>
-            Free
+            <h1>Free</h1>
         </template>
     </div>
 </template>

@@ -13,6 +13,9 @@
                 </div>
             </div>
         </template>
+        <span :style="currentTimeStyle" class="current-time-container">
+            <span class="current-time">{{ currentTime }}</span>
+        </span>
     </div>
 </template>
 
@@ -27,16 +30,31 @@
                 });
                 hour++;
             }
+            setInterval(() => {
+                this.getCurrentTimeStyles();
+            }, 1000);
+            this.getCurrentTimeStyles();
         },
         data() {
             return {
-                hours : []
+                hours : [],
+                currentTime : null,
+                currentTimeStyle : null,
+            }
+        },
+        methods : {
+            getCurrentTimeStyles() {
+                let now = this.now();
+                let startEM = ((((now.format('HH') * 60) + parseInt(now.format('mm')))) * 6) / 60;
+                this.currentTime = now.format('h:mm A');
+                this.currentTimeStyle =  `top:${startEM }em;`;
             }
         },
         computed : {
             bookings() {
                 return this.$store.state.rooms.events.events;
-            }
+            },
+
         }
     }
 </script>
