@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="booking-status">
         <template v-if="currentBooking">
             <h1>Booked until {{ formatTime(currentBooking.end_date) }}</h1>
         </template>

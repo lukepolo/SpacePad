@@ -5,13 +5,11 @@
             <nav class="room-header level">
                 <!-- Left side -->
                 <div class="level-left">
-                    <div class="level-item">
-                        <p class="subtitle is-5">{{ currentDate }}</p>
-                    </div>
+                    <h2>{{ room.name }}</h2>
                 </div>
                 <!-- Right side -->
                 <div class="level-right">
-                    <p class="level-item">{{ room.name }}</p>
+                    <h2>{{ currentDate }}</h2>
                 </div>
             </nav>
 
@@ -19,26 +17,14 @@
             <div class="columns room-details">
 
                 <div class="column calendar-wrapper">
-                    <div class="level booking-status">
-                       <div class="level-item">
-                           <room-status></room-status>
-                       </div>
-                    </div>
-                    <div class="level bookings">
-                        <calendar></calendar>
-                    </div>
+                    <room-status></room-status>
+                    <calendar></calendar>
                 </div>
 
                 <div class="column tabs">
-                    <div class="tab-buttons">
-                        <div class="button">
-                            Bookings
-                        </div>
-                        <div class="button">
-                            Attendees
-                        </div>
-                    </div>
                     <div class="tab-content">
+                        Display Room Details Here :
+                        Seats, technologies, connectors
                         <booking-attendees :booking="selectedBooking"></booking-attendees>
                     </div>
                 </div>
@@ -77,11 +63,6 @@
             RoomStatus,
             BookingAttendees,
         },
-        data() {
-            return {
-                selectedBooking : null
-            }
-        },
         created() {
             this.$store.dispatch('rooms/show', this.$route.params.room);
             this.$store.dispatch('rooms/events/get', this.$route.params.room)
@@ -91,8 +72,11 @@
                 return this.$store.state.rooms.room;
             },
             currentDate() {
-              return moment().format('lll')
+              return moment().format('ll')
             },
+            selectedBooking() {
+                return this.$store.state.rooms.events.event;
+            }
         }
     }
 </script>

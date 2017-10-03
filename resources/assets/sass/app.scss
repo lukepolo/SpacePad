@@ -1,14 +1,23 @@
 @import '~bulma';
 
+$blue:                          #48ACF0;
+$red:                           #F4645F;
+$green:                         #83B692;
+$yellow:                        #FEC07A;
+
 @import "modules/calendar";
 
 html, body, #app-layout, #room, #room-content {
   height : 100%;
   min-height: 100%;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 
 h1 {
   font-size : 2em;
+}
+
+h2 {
+  font-size : 1.5em;
 }
