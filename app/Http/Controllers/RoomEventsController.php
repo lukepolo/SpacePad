@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\RoomEvent;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Contracts\CalendarServiceContract as CalendarService;
 
@@ -38,12 +39,13 @@ class RoomEventsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
+     * @param Room $room
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Room $room)
     {
-        // TODO - book
+        return response()->json($this->calendarService->createBooking($room, Carbon::now(), Carbon::now()->addMinutes($request->get('minutes'))));
     }
 
     /**

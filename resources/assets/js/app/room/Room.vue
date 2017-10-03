@@ -32,13 +32,20 @@
                 </div>
 
                 <div class="column tabs">
-                    <div class="tab-content">
-                        Display Room Details Here :
-                        Seats, technologies, connectors
+                    <div class="tab-content"  v-if="selectedBooking">
+                        10 Seats, TV : HDMI
+                        <hr>
+                        <h2>
+                            {{ selectedBooking.subject }}<br>
+                            <small>{{ formatTime(selectedBooking.start_date) }} - {{ formatTime(selectedBooking.end_date) }}</small>
+                        </h2>
                         <booking-attendees :booking="selectedBooking"></booking-attendees>
+
+                        <br><br><br><br>
+
+                        <div class="button button-green">Check In</div>
                     </div>
                 </div>
-
             </div>
 
             <div class="room-footer" :class="{ booked : currentBooking , free : !currentBooking}">
@@ -46,12 +53,25 @@
                     <!-- Left side -->
                     <div class="level-left">
                         <div class="level-item">
-                            Release / (Check In / Start Early)
+                            <template v-if="currentBooking || nextBooking">
+                                <div class="button" @click="checkIn()">
+                                    Check In
+                                </div>
+                            </template>
                         </div>
                     </div>
 
                     <!-- Right side -->
                     <div class="level-right">
+                        <template v-if="!currentBooking">
+                            <div class="book-room-container">
+                                <span>Book</span>
+                                <span class="button" @click="bookRoom(15)">15</span>
+                                <span class="button" @click="bookRoom(30)">30</span>
+                                <span class="button" @click="bookRoom(45)">45</span>
+                                <span class="button" @click="bookRoom(60)">60</span>
+                            </div>
+                        </template>
                         <p class="level-item">
                             Find Another space
                         </p>
@@ -73,7 +93,25 @@
         },
         created() {
             this.$store.dispatch('rooms/show', this.$route.params.room);
+            this.currentTimeScrollInterval = setInterval(() => {
+                this.$store.dispatch('rooms/events/get', this.$route.params.room)
+            }, ((5 * 60) * 1000));
             this.$store.dispatch('rooms/events/get', this.$route.params.room)
+        },
+        methods : {
+            bookRoom(minutes) {
+                this.$store.dispatch('rooms/events/create', {
+                    minutes : minutes,
+                    room : this.$route.params.room,
+                })
+            },
+            checkIn() {
+                console.info('need some logic here')
+//                this.$store.dispatch('rooms/events/checkin', {
+//                    event : event.id,
+//                    room : this.$route.params.room,
+//                })
+            },
         },
         computed: {
             room() {
@@ -83,7 +121,11 @@
               return moment().format('ll')
             },
             selectedBooking() {
-                return this.$store.state.rooms.events.event;
+                let selectedBooking = this.$store.state.rooms.events.event;
+                if(!selectedBooking) {
+                    return this.nextBooking
+                }
+                return selectedBooking
             },
             bookings() {
                 return this.$store.state.rooms.events.events;

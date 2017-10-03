@@ -57,6 +57,7 @@
 #room-content {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   .room-header, .room-footer {
     color: $white;

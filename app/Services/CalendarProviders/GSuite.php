@@ -10,6 +10,7 @@ use Google_Service_Calendar;
 use Illuminate\Http\Request;
 use App\Models\RoomProvider;
 use Google_Service_Exception;
+use Google_Service_Calendar_Event;
 use App\Exceptions\InvalidUserRequest;
 use App\Exceptions\InvalidRoomsRequest;
 use App\Exceptions\InvalidTokenRequest;
@@ -138,6 +139,43 @@ class GSuite
     }
 
     /**
+     * @param Room $room
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return array
+     */
+    public function createBooking(Room $room, Carbon $start, Carbon $end)
+    {
+
+        $event = new Google_Service_Calendar_Event(array(
+            'summary' => 'Quick Booking',
+            'start' => array(
+                'dateTime' => $start->toRfc3339String(),
+                'timeZone' => "UTC",
+            ),
+            'end' => array(
+                'dateTime' => $end->toRfc3339String(),
+                'timeZone' => 'UTC',
+            )
+        ));
+
+        $event = $this->googleCalendarService->events->insert($room->provider_calendar_id, $event);
+
+        return [
+            'attendees' => [],
+            'id' => $event->getId(),
+            'room_id' => $room->id,
+            'link' => $event->getHtmlLink(),
+            'subject' => $event->getSummary(),
+            'location' => $event->getLocation(),
+            'organizer' => $event->getOrganizer()->getDisplayName(),
+            'organizer_email' => $event->getOrganizer()->getEmail(),
+            'end_date' => Carbon::parse($event->getEnd()->dateTime, $event->getEnd()->timeZone)->tz('UTC'),
+            'start_date' => Carbon::parse($event->getStart()->dateTime, $event->getStart()->timeZone)->tz('UTC'),
+        ];
+    }
+
+    /**
      * Gets all the calendars event, given the calendar ID
      *
      * @param Room $room
@@ -171,7 +209,7 @@ class GSuite
 
             $events = [];
 
-            /** @var \Google_Service_Calendar_Event $event */
+            /** @var Google_Service_Calendar_Event $event */
             foreach($eventsList->getItems() as $event) {
                 $eventData = [
                     'attendees' => [],

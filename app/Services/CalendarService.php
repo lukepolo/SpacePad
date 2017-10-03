@@ -92,6 +92,36 @@ class CalendarService implements CalendarServiceContract
 
     /**
      * @param Room $room
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return GSuite|Office365
+     */
+    public function createBooking(Room $room, Carbon $start, Carbon $end)
+    {
+        $event = $this->getProvider($room->roomProvider)->createBooking($room, $start, $end);
+
+        $roomEvent = RoomEvent::firstOrNew([
+            'room_id' => $room->id,
+            'event_id' => $event['id']
+        ]);
+
+        $roomEvent->fill([
+            'link' => $event['link'],
+            'subject' => $event['subject'],
+            'end_date' => $event['end_date'],
+            'location' => $event['location'],
+            'organizer' => $event['organizer'],
+            'start_date' => $event['start_date'],
+            'organizer_email' => $event['organizer_email'],
+        ]);
+
+        $roomEvent->save();
+
+        return $roomEvent;
+    }
+
+    /**
+     * @param Room $room
      * @return array
      */
     public function getCalendarEvents(Room $room)
