@@ -181,8 +181,7 @@ class GSuite
      */
     public function updateBooking(Room $room, RoomEvent $roomEvent, Carbon $start, Carbon $end)
     {
-        // TODO - updating makes subject go away
-        $this->googleCalendarService->events->update($room->provider_calendar_id, $roomEvent->event_id, new Google_Service_Calendar_Event([
+        $this->googleCalendarService->events->patch($room->provider_calendar_id, $roomEvent->event_id, new Google_Service_Calendar_Event([
                 'start' => array(
                     'dateTime' => $start->toRfc3339String(),
                     'timeZone' => "UTC",

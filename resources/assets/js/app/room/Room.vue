@@ -33,7 +33,7 @@
 
                 <div class="column tabs">
                     <div class="tab-content"  v-if="selectedBooking">
-                        10 Seats, TV : HDMI
+                        10 Seats, TV : HDMI <-- TODO
                         <hr>
                         <h2>
                             {{ selectedBooking.subject }}<br>
@@ -76,7 +76,7 @@
                             </div>
                         </template>
                         <p class="level-item">
-                            Find Another space
+                            Find Another space <-- TODO
                         </p>
                     </div>
                 </div>
