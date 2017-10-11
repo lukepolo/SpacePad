@@ -24,7 +24,7 @@
                return moment.duration(this.parseDate(this.booking.end_date).diff(this.parseDate(this.booking.start_date))).asMinutes()
            },
            shouldDisplay() {
-               return this.timeDifference >= 15;
+               return this.timeDifference >= 5;
 
            },
             shouldDisplaySubject() {

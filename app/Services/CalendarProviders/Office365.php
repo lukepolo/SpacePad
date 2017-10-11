@@ -289,7 +289,7 @@ class Office365 implements CalendarProviderInterface
     public function createBooking(Room $room, Carbon $start, Carbon $end)
     {
         try {
-            return $this->makeApiCall(
+            $event = $this->makeApiCall(
                 "POST",
                 $this->graphApiURL . '/users/' . $room->provider_calendar_owner . '/calendars/' . $room->provider_calendar_id . '/events', [
                     "subject" => "Quick Booking",
@@ -307,6 +307,21 @@ class Office365 implements CalendarProviderInterface
                     "body" => ["contentType" => "HTML", "content" => "Booked through SpacePad"]
                 ]
             );
+
+            return [
+                'attendees' => [],
+                'id' => $event->id,
+                'room_id' => $room->id,
+                'link' => $event->webLink,
+                'subject' => $event->subject,
+                'location' => $event->location->displayName,
+                'organizer' => $event->organizer->emailAddress->name,
+                'organizer_email' => $event->organizer->emailAddress->address,
+                'end_date' => Carbon::parse($event->end->dateTime, $event->end->timeZone)->tz('UTC'),
+                'start_date' => Carbon::parse($event->start->dateTime, $event->start->timeZone)->tz('UTC'),
+            ];
+
+
         } catch (ClientException $e) {
             throw new InvalidBookingRequest($e->getResponse()->getBody()->getContents());
         }
@@ -325,7 +340,7 @@ class Office365 implements CalendarProviderInterface
         try {
             return $this->makeApiCall(
                 "PATCH",
-                $this->graphApiURL . '/users/' . $room->provider_calendar_owner . '/calendars/' . $room->provider_calendar_id . '/events' . $roomEvent->event_id,
+                $this->graphApiURL . '/users/' . $room->provider_calendar_owner . '/calendars/' . $room->provider_calendar_id . '/events/' . $roomEvent->event_id,
                 [
                     "start" => [
                         'dateTime' => $start->toW3cString(),
