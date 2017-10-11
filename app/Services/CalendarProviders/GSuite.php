@@ -2,9 +2,10 @@
 
 namespace App\Services\CalendarProviders;
 
-use App\Models\Room;
 use Carbon\Carbon;
 use Google_Client;
+use App\Models\Room;
+use App\Models\RoomEvent;
 use Google_Service_Oauth2;
 use Google_Service_Calendar;
 use Illuminate\Http\Request;
@@ -146,7 +147,6 @@ class GSuite
      */
     public function createBooking(Room $room, Carbon $start, Carbon $end)
     {
-
         $event = new Google_Service_Calendar_Event(array(
             'summary' => 'Quick Booking',
             'start' => array(
@@ -170,9 +170,29 @@ class GSuite
             'location' => $event->getLocation(),
             'organizer' => $event->getOrganizer()->getDisplayName(),
             'organizer_email' => $event->getOrganizer()->getEmail(),
-            'end_date' => Carbon::parse($event->getEnd()->dateTime, $event->getEnd()->timeZone)->tz('UTC'),
-            'start_date' => Carbon::parse($event->getStart()->dateTime, $event->getStart()->timeZone)->tz('UTC'),
         ];
+    }
+
+    /**
+     * @param Room $room
+     * @param RoomEvent $roomEvent
+     * @param Carbon $start
+     * @param Carbon $end
+     */
+    public function updateBooking(Room $room, RoomEvent $roomEvent, Carbon $start, Carbon $end)
+    {
+        // TODO - updating makes subject go away
+        $this->googleCalendarService->events->update($room->provider_calendar_id, $roomEvent->event_id, new Google_Service_Calendar_Event([
+                'start' => array(
+                    'dateTime' => $start->toRfc3339String(),
+                    'timeZone' => "UTC",
+                ),
+                'end' => array(
+                    'dateTime' => $end->toRfc3339String(),
+                    'timeZone' => 'UTC',
+                )
+            ])
+        );
     }
 
     /**

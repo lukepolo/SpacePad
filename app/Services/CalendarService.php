@@ -106,18 +106,37 @@ class CalendarService implements CalendarServiceContract
         ]);
 
         $roomEvent->fill([
+            'end_date' => $end,
+            'start_date' => $start,
             'link' => $event['link'],
             'subject' => $event['subject'],
-            'end_date' => $event['end_date'],
             'location' => $event['location'],
             'organizer' => $event['organizer'],
-            'start_date' => $event['start_date'],
             'organizer_email' => $event['organizer_email'],
         ]);
 
         $roomEvent->save();
 
-        return $roomEvent;
+        return $roomEvent->fresh();
+    }
+
+    /**
+     * @param Room $room
+     * @param RoomEvent $roomEvent
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return RoomEvent
+     */
+    public function updateBooking(Room $room, RoomEvent $roomEvent, Carbon $start, Carbon $end)
+    {
+        $this->getProvider($room->roomProvider)->updateBooking($room, $roomEvent, $start, $end);
+
+        $roomEvent->update([
+            'end_date' => $end,
+            'start_date' => $start,
+        ]);
+
+        return $roomEvent->refresh();
     }
 
     /**
@@ -126,12 +145,15 @@ class CalendarService implements CalendarServiceContract
      */
     public function getCalendarEvents(Room $room)
     {
+        // We need to refresh the events
+        $room->events()->delete();
+
         $events = [];
         $tempEvents = $this->getProvider($room->roomProvider)->getCalendarEvents($room);
 
         foreach($tempEvents as $event) {
 
-            $roomEvent = RoomEvent::firstOrNew([
+            $roomEvent = RoomEvent::withTrashed()->firstOrNew([
                 'room_id' => $room->id,
                 'event_id' => $event['id']
             ]);
@@ -144,6 +166,7 @@ class CalendarService implements CalendarServiceContract
                 'organizer' => $event['organizer'],
                 'start_date' => $event['start_date'],
                 'organizer_email' => $event['organizer_email'],
+                'deleted_at' => null,
             ]);
 
             $roomEvent->save();

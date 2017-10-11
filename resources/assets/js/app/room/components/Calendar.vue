@@ -4,14 +4,7 @@
             <div class="hour">{{ hour.display }}</div>
         </div>
         <template v-for="booking in bookings">
-            <div class="booking" :style="getTimeHeightStyle(booking.start_date, booking.end_date)" @click="selectBooking(booking)">
-                <div>
-                    {{ formatTime(booking.start_date) }} - {{ formatTime(booking.end_date) }}
-                </div>
-                <div>
-                    {{ booking.subject }}
-                </div>
-            </div>
+            <booking :booking="booking"></booking>
         </template>
         <span :style="currentTimeStyle" class="current-time-container" ref="current-time-container">
             <span class="current-time">{{ currentTime }}</span>
@@ -20,7 +13,11 @@
 </template>
 
 <script>
+    import Booking from './../components/Booking.vue';
     export default {
+        components: {
+          Booking
+        },
         created() {
             let hour = 0;
             while(hour < 24) {
@@ -47,9 +44,6 @@
             }
         },
         methods : {
-            selectBooking(booking) {
-                this.$store.commit('rooms/events/set', booking)
-            },
             setScrollTimeout() {
                 clearTimeout(this.currentTimeScrollInterval);
                 this.currentTimeScrollInterval = setInterval(() => {
@@ -82,7 +76,6 @@
             bookings() {
                 return this.$store.state.rooms.events.events;
             },
-
         }
     }
 </script>

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Room;
+use App\Models\RoomEvent;
 use App\Models\RoomProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,7 @@ class RouteServiceProvider extends ServiceProvider
 
         Route::model('user', User::class);
         Route::model('room', Room::class);
+        Route::model('event', RoomEvent::class);
         Route::model('provider', RoomProvider::class);
     }
 

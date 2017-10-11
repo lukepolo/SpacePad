@@ -43,7 +43,10 @@
 
                         <br><br><br><br>
 
-                        <div class="button button-green">Check In</div>
+                        <template v-if="currentBooking == selectedBooking">
+                            <div class="button" @click="endBooking">End Booking</div>
+                        </template>
+
                     </div>
                 </div>
             </div>
@@ -106,11 +109,20 @@
                 })
             },
             checkIn() {
-                console.info('need some logic here')
-//                this.$store.dispatch('rooms/events/checkin', {
-//                    event : event.id,
-//                    room : this.$route.params.room,
-//                })
+                this.$store.dispatch('rooms/events/update', {
+                    end : this.now(),
+                    room : this.$route.params.room,
+                    event : this.currentBooking.id,
+                    start : this.currentBooking.start_date
+                })
+            },
+            endBooking() {
+                this.$store.dispatch('rooms/events/update', {
+                    end : this.now(),
+                    room : this.$route.params.room,
+                    event : this.currentBooking.id,
+                    start : this.currentBooking.start_date,
+                })
             },
         },
         computed: {

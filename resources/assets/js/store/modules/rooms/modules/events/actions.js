@@ -5,3 +5,7 @@ export const get = ({}, room) => {
 export const create = ({}, data) => {
     Vue.request(data).post(`/api/rooms/${data.room}/events`, 'rooms/events/add')
 }
+
+export const update = ({}, data) => {
+    Vue.request(data).put(`/api/rooms/${data.room}/events/${data.event}`, 'rooms/events/update')
+}

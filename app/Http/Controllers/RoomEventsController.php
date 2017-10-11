@@ -45,7 +45,13 @@ class RoomEventsController extends Controller
      */
     public function store(Request $request, Room $room)
     {
-        return response()->json($this->calendarService->createBooking($room, Carbon::now(), Carbon::now()->addMinutes($request->get('minutes'))));
+        return response()->json(
+            $this->calendarService->createBooking(
+                $room,
+                Carbon::now(),
+                Carbon::now()->addMinutes($request->get('minutes'))
+            )
+        );
     }
 
     /**
@@ -67,23 +73,32 @@ class RoomEventsController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param Room $room
-     * @param  int $id
+     * @param RoomEvent $roomEvent
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Room $room, $id)
+    public function update(Request $request, Room $room, RoomEvent $roomEvent)
     {
-        // TODO - extend
+        return response()->json(
+            $this->calendarService->updateBooking(
+                $room,
+                $roomEvent,
+                Carbon::parse($request->get('start')),
+                Carbon::parse($request->get('end'))
+            )
+        );
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param Room $room
-     * @param  int $id
+     * @param RoomEvent $roomEvent
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Room $room, $id)
+    public function destroy(Room $room, RoomEvent $roomEvent)
     {
-        // TODO - end early
+        return response()->json(
+            $this->calendarService->updateBooking($room, $roomEvent, $roomEvent->start_date, Carbon::now())
+        );
     }
 }
