@@ -98,6 +98,8 @@ class CalendarService implements CalendarServiceContract
      */
     public function createBooking(Room $room, Carbon $start, Carbon $end)
     {
+        $end = $this->normalizeEndTime($end->minute(round($end->minute / 15) * 15));
+
         $event = $this->getProvider($room->roomProvider)->createBooking($room, $start, $end);
 
         $roomEvent = RoomEvent::firstOrNew([
@@ -215,5 +217,14 @@ class CalendarService implements CalendarServiceContract
                 throw new InvalidProvider('We do not support ' . $roomProvider);
                 break;
         }
+    }
+
+    /**
+     * @param Carbon $end
+     * @return Carbon
+     */
+    private function normalizeEndTime(Carbon $end)
+    {
+        return $end->minute(round($end->minute / 15) * 15);
     }
 }

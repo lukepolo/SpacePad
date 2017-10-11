@@ -15,6 +15,7 @@ use Google_Service_Calendar_Event;
 use App\Exceptions\InvalidUserRequest;
 use App\Exceptions\InvalidRoomsRequest;
 use App\Exceptions\InvalidTokenRequest;
+use App\Exceptions\InvalidBookingRequest;
 use App\Exceptions\InvalidCalendarRequest;
 
 /**
@@ -24,9 +25,13 @@ use App\Exceptions\InvalidCalendarRequest;
  * http://graph.microsoft.io/en-us/docs/authorization/app_only
  * https://graph.microsoft.io/en-us/docs/overview/overview
  */
-class GSuite
+class GSuite implements CalendarProviderInterface
 {
-    private $calendarProvider;
+    /** @var Google_Client Google_Client  */
+    protected $client;
+
+    /** @var RoomProvider|null $calendarProvider  */
+    protected $calendarProvider;
 
     /** @var Google_Service_Oauth2 $googleOAuthService */
     protected $googleOAuthService = null;
@@ -148,7 +153,6 @@ class GSuite
     public function createBooking(Room $room, Carbon $start, Carbon $end)
     {
         $event = new Google_Service_Calendar_Event(array(
-            'summary' => 'Quick Booking',
             'start' => array(
                 'dateTime' => $start->toRfc3339String(),
                 'timeZone' => "UTC",
@@ -156,8 +160,12 @@ class GSuite
             'end' => array(
                 'dateTime' => $end->toRfc3339String(),
                 'timeZone' => 'UTC',
-            )
+            ),
         ));
+
+        $event->setLocation($room->name);
+        $event->setSummary('Quick Booking');
+        $event->setDescription('Booked through SpacePad');
 
         $event = $this->googleCalendarService->events->insert($room->provider_calendar_id, $event);
 
@@ -178,20 +186,25 @@ class GSuite
      * @param RoomEvent $roomEvent
      * @param Carbon $start
      * @param Carbon $end
+     * @throws InvalidBookingRequest
      */
     public function updateBooking(Room $room, RoomEvent $roomEvent, Carbon $start, Carbon $end)
     {
-        $this->googleCalendarService->events->patch($room->provider_calendar_id, $roomEvent->event_id, new Google_Service_Calendar_Event([
-                'start' => array(
-                    'dateTime' => $start->toRfc3339String(),
-                    'timeZone' => "UTC",
-                ),
-                'end' => array(
-                    'dateTime' => $end->toRfc3339String(),
-                    'timeZone' => 'UTC',
-                )
-            ])
-        );
+        try {
+            $this->googleCalendarService->events->patch($room->provider_calendar_id, $roomEvent->event_id, new Google_Service_Calendar_Event([
+                    'start' => array(
+                        'dateTime' => $start->toRfc3339String(),
+                        'timeZone' => "UTC",
+                    ),
+                    'end' => array(
+                        'dateTime' => $end->toRfc3339String(),
+                        'timeZone' => 'UTC',
+                    )
+                ])
+            );
+        } catch(Google_Service_Exception $e) {
+            throw new InvalidBookingRequest($e->getMessage());
+        }
     }
 
     /**

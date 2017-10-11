@@ -2,13 +2,14 @@
 
 namespace App\Services\CalendarProviders;
 
-use App\Models\Room;
+use App\Exceptions\InvalidBookingRequest;
 use Carbon\Carbon;
+use App\Models\Room;
 use GuzzleHttp\Client;
+use App\Models\RoomEvent;
 use Illuminate\Http\Request;
 use App\Models\RoomProvider;
 use Illuminate\Support\Collection;
-use Illuminate\Http\RedirectResponse;
 use App\Exceptions\InvalidUserRequest;
 use App\Exceptions\InvalidRoomsRequest;
 use App\Exceptions\InvalidTokenRequest;
@@ -22,7 +23,7 @@ use App\Exceptions\InvalidCalendarRequest;
  * http://graph.microsoft.io/en-us/docs/authorization/app_only
  * https://graph.microsoft.io/en-us/docs/overview/overview
  */
-class Office365
+class Office365 implements CalendarProviderInterface
 {
     private $calendarProvider;
 
@@ -260,8 +261,8 @@ class Office365
                         case 'none' :
                             $status = 'needsAction';
                             break;
-//                            accepted
-                    // declined
+                        // accepted
+                        // declined
                     }
 
                     $eventData['attendees'][] = [
@@ -278,154 +279,68 @@ class Office365
         }
     }
 
-//
-//    /**
-//     * Creates a calendar booking
-//     *
-//     * @param OfficeOauthToken $token
-//     * @param Space $space
-//     * @param $minutes
-//     * @return mixed
-//     * @throws SpaceError
-//     */
-//    public function makeCalendarEvent(OfficeOauthToken $token, Space $space, $minutes)
-//    {
-//        $startDateTime = Carbon::now();
-//        $endDateTime = $startDateTime->copy()->addMinutes($minutes);
-//
-//        $endDateTime->minute(round($endDateTime->minute / 15) * 15);
-//
-//        $conflictedMeetings = $this->getCalendarEvents($token, $space->calendar, $startDateTime, $endDateTime)->value;
-//        if (count($conflictedMeetings) > 0) {
-//            foreach ($conflictedMeetings as $conflictedMeeting) {
-//                $this->calendarService->saveEvent($space->calendar, $conflictedMeeting);
-//            }
-//
-//            event(new SpaceChanged($space));
-//
-//            throw new SpaceError('Sorry, the space has already been booked at this time');
-//        }
-//
-//        try {
-//            return $this->makeApiCall(
-//                $token,
-//                "POST",
-//                $this->graphApiURL . '/users/' . $space->calendar->owner . '/calendars/' . $space->calendar->calendar_id . '/events',
-//                [
-//                    "subject" => "Quick Booking",
-//                    "location" => [
-//                        "displayName" => $space->name
-//                    ],
-//                    "start" => [
-//                        'dateTime' => $startDateTime->toW3cString(),
-//                        'timeZone' => $startDateTime->tzName
-//                    ],
-//                    "end" => [
-//                        'dateTime' => $endDateTime->toW3cString(),
-//                        'timeZone' => $endDateTime->tzName
-//                    ],
-//                    "body" => ["contentType" => "HTML", "content" => "Booked through CalSync"]
-//                ]
-//            );
-//        } catch (ClientException $e) {
-//            throw new SpaceError($e->getResponse()->getBody()->getContents());
-//        }
-//    }
-//
-//    /**
-//     * Ends the current event
-//     *
-//     * @param OfficeOauthToken $token
-//     * @param Space $space
-//     * @param RoomEvent $event
-//     * @return mixed
-//     * @throws SpaceError
-//     */
-//    public function endCalendarEvent(OfficeOauthToken $token, Space $space, RoomEvent $event)
-//    {
-//        $now = Carbon::now();
-//        try {
-//            return $this->makeApiCall(
-//                $token,
-//                "PATCH",
-//                $this->graphApiURL . '/users/' . $space->calendar->owner . '/calendars/' . $space->calendar->calendar_id . '/events/' . $event->event_id,
-//                [
-//                    "end" => [
-//                        'dateTime' => $now->toW3cString(),
-//                        'timeZone' => $now->tzName
-//                    ],
-//                ]
-//            );
-//        } catch (ClientException $e) {
-//            throw new SpaceError($e->getResponse()->getBody()->getContents());
-//        }
-//    }
-//
-//    /**
-//     * Ends the current event
-//     *
-//     * @param OfficeOauthToken $token
-//     * @param Space $space
-//     * @param RoomEvent $event
-//     * @return mixed
-//     * @throws SpaceError
-//     */
-//    public function startCalendarEvent(OfficeOauthToken $token, Space $space, RoomEvent $event)
-//    {
-//        $now = Carbon::now();
-//        try {
-//            return $this->makeApiCall(
-//                $token,
-//                "PATCH",
-//                $this->graphApiURL . '/users/' . $space->calendar->owner . '/calendars/' . $space->calendar->calendar_id . '/events/' . $event->event_id,
-//                [
-//                    "start" => [
-//                        'dateTime' => $now->toW3cString(),
-//                        'timeZone' => $now->tzName
-//                    ],
-//                ]
-//            );
-//        } catch (ClientException $e) {
-//            throw new SpaceError($e->getResponse()->getBody()->getContents());
-//        }
-//    }
-//
-//    /**
-//     * Extends a calendar event
-//     *
-//     * @param OfficeOauthToken $token
-//     * @param Space $space
-//     * @param RoomEvent $event
-//     * @param $minutes
-//     * @return mixed
-//     * @throws SpaceError
-//     */
-//    public function extendCalendarEvent(OfficeOauthToken $token, Space $space, RoomEvent $event, $minutes)
-//    {
-//        $startDateTime = $event->end_date->copy()->addSecond();
-//        $endDateTime = $event->end_date->addMinutes($minutes);
-//        $endDateTime->minute(round($endDateTime->minute / 15) * 15);
-//
-//        if (count($this->getCalendarEvents($token, $space->calendar, $startDateTime, $endDateTime)->value)) {
-//            throw new SpaceError('Sorry, the space has already been booked at this time');
-//        }
-//
-//        try {
-//            return $this->makeApiCall(
-//                $token,
-//                "PATCH",
-//                $this->graphApiURL . '/users/' . $space->calendar->owner . '/calendars/' . $space->calendar->calendar_id . '/events/' . $event->event_id,
-//                [
-//                    "end" => [
-//                        'dateTime' => $endDateTime->toW3cString(),
-//                        'timeZone' => $endDateTime->tzName
-//                    ],
-//                ]
-//            );
-//        } catch (ClientException $e) {
-//            throw new SpaceError($e->getResponse()->getBody()->getContents());
-//        }
-//    }
+    /**
+     * @param Room $room
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return array
+     * @throws InvalidBookingRequest
+     */
+    public function createBooking(Room $room, Carbon $start, Carbon $end)
+    {
+        try {
+            return $this->makeApiCall(
+                "POST",
+                $this->graphApiURL . '/users/' . $room->provider_calendar_owner . '/calendars/' . $room->provider_calendar_id . '/events', [
+                    "subject" => "Quick Booking",
+                    "location" => [
+                        "displayName" => $room->name
+                    ],
+                    "start" => [
+                        'dateTime' => $start->toW3cString(),
+                        'timeZone' => $end->tzName
+                    ],
+                    "end" => [
+                        'dateTime' => $end->toW3cString(),
+                        'timeZone' => $end->tzName
+                    ],
+                    "body" => ["contentType" => "HTML", "content" => "Booked through SpacePad"]
+                ]
+            );
+        } catch (ClientException $e) {
+            throw new InvalidBookingRequest($e->getResponse()->getBody()->getContents());
+        }
+    }
+
+    /**
+     * @param Room $room
+     * @param RoomEvent $roomEvent
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return mixed
+     * @throws InvalidBookingRequest
+     */
+    public function updateBooking(Room $room, RoomEvent $roomEvent, Carbon $start, Carbon $end)
+    {
+        try {
+            return $this->makeApiCall(
+                "PATCH",
+                $this->graphApiURL . '/users/' . $room->provider_calendar_owner . '/calendars/' . $room->provider_calendar_id . '/events' . $roomEvent->event_id,
+                [
+                    "start" => [
+                        'dateTime' => $start->toW3cString(),
+                        'timeZone' => $end->tzName
+                    ],
+                    "end" => [
+                        'dateTime' => $end->toW3cString(),
+                        'timeZone' => $end->tzName
+                    ],
+                ]
+            );
+        } catch (ClientException $e) {
+            throw new InvalidBookingRequest($e->getResponse()->getBody()->getContents());
+        }
+    }
 
     /**
      * Gets the next set of paginated data based on a response from office365
@@ -489,9 +404,6 @@ class Office365
                 break;
             case "DELETE":
                 break;
-            default:
-                dd("INVALID METHOD: " . $method);
-                exit;
         }
 
         return json_decode($response->getBody()->getContents());
