@@ -83,7 +83,8 @@ class RoomEventsController extends Controller
                 $room,
                 $roomEvent,
                 Carbon::parse($request->get('start')),
-                Carbon::parse($request->get('end'))
+                Carbon::parse($request->get('end')),
+                $request->get('checked_in')
             )
         );
     }

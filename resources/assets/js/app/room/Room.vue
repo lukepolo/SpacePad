@@ -56,7 +56,7 @@
                     <!-- Left side -->
                     <div class="level-left">
                         <div class="level-item">
-                            <template v-if="currentBooking || nextBooking">
+                            <template v-if="checkingIntoBooking && !checkingIntoBooking.checked_in">
                                 <div class="button" @click="checkIn()">
                                     Check In
                                 </div>
@@ -109,12 +109,16 @@
                 })
             },
             checkIn() {
-                this.$store.dispatch('rooms/events/update', {
-                    end : this.now(),
-                    room : this.$route.params.room,
-                    event : this.currentBooking.id,
-                    start : this.currentBooking.start_date
-                })
+                if(this.checkingIntoBooking) {
+                    let booking = this.checkingIntoBooking;
+                    this.$store.dispatch('rooms/events/update', {
+                        event : booking.id,
+                        end : booking.end_date,
+                        room : this.$route.params.room,
+                        start : this.now() < this.parseDate(booking.start_date) ? this.now() : booking.start_date,
+                        checked_in : true,
+                    })
+                }
             },
             endBooking() {
                 this.$store.dispatch('rooms/events/update', {
@@ -128,6 +132,11 @@
         computed: {
             room() {
                 return this.$store.state.rooms.room;
+            },
+            checkingIntoBooking() {
+                if(this.currentBooking || this.nextBooking) {
+                    return this.currentBooking ? this.currentBooking : this.nextBooking;
+                }
             },
             currentDate() {
               return moment().format('ll')

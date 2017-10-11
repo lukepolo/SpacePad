@@ -24,6 +24,7 @@ class CreateRoomEventsTable extends Migration
             $table->dateTime('end_date');
             $table->string('location')->nullable();
             $table->longText('link');
+            $table->tinyInteger('checked_in')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

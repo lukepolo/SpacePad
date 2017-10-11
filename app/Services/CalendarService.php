@@ -125,15 +125,17 @@ class CalendarService implements CalendarServiceContract
      * @param RoomEvent $roomEvent
      * @param Carbon $start
      * @param Carbon $end
+     * @param bool $checkedIn
      * @return RoomEvent
      */
-    public function updateBooking(Room $room, RoomEvent $roomEvent, Carbon $start, Carbon $end)
+    public function updateBooking(Room $room, RoomEvent $roomEvent, Carbon $start, Carbon $end, $checkedIn = false)
     {
         $this->getProvider($room->roomProvider)->updateBooking($room, $roomEvent, $start, $end);
 
         $roomEvent->update([
             'end_date' => $end,
             'start_date' => $start,
+            'checked_in' => $checkedIn,
         ]);
 
         return $roomEvent->refresh();
