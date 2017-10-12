@@ -1,5 +1,5 @@
 import auth from "./auth";
-import rooms from './rooms';
+import rooms from "./rooms";
 import system from "./system";
 import providers from "./providers";
 import notifications from "./notifications";
@@ -9,5 +9,5 @@ export default {
   rooms,
   system,
   providers,
-  notifications,
+  notifications
 };
