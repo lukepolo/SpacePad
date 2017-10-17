@@ -1,6 +1,8 @@
 <template>
-    <div>
+    <section>
         <navigation></navigation>
-        <router-view></router-view>
-    </div>
+        <div class="container">
+            <router-view></router-view>
+        </div>
+    </section>
 </template>

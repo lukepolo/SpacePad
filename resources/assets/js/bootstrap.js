@@ -85,5 +85,6 @@ window.Echo = new Echo({
 // }
 
 // Font awesome PRO
-require("@/../vendor/fontawesome-5.0.0-rc2/js/packs/light");
-require("@/../vendor/fontawesome-5.0.0-rc2/js/fontawesome");
+require("@/../vendor/fontawesome-5.0.0-rc3/js/packs/brands");
+require("@/../vendor/fontawesome-5.0.0-rc3/js/packs/light");
+require("@/../vendor/fontawesome-5.0.0-rc3/js/fontawesome");

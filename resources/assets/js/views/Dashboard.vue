@@ -1,35 +1,27 @@
 <template>
     <div>
         <template v-if="providers.length == 0 ">
-            Lets connect your first account
+            <h1>Lets connect your first account</h1>
+            <a href="/provider/office365/link">Office 365</a>
+            <a href="/provider/gsuite/link">GSuite</a>
         </template>
-        <template v-else>
-            Connect a new account
-        </template>
-        <a href="/provider/office365/link">Office 365</a>
-        <a href="/provider/gsuite/link">GSuite</a>
-        <h3>Connected Accounts</h3>
-        <template v-for="provider in providers">
-            <router-link :to="{ name : 'provider_rooms', params : { provider : provider.id }}">
-                {{ provider.email }} [{{ provider.provider }}]
-            </router-link>
-        </template>
-        <h3>Rooms</h3>
-        <template v-for="room in rooms">
-            <div>
-                <router-link :to="{ name : 'room', params : { room : room.id }}">
-                    {{ room.name }}
-                </router-link>
-                <router-link :to="{ name : 'room-modify', params : { room : room.id }}">
-                    [modify]
-                </router-link>
-            </div>
-        </template>
+        <div class="columns">
+            <template v-for="provider in providers">
+                <div class="column is-half">
+                    <account-card :account="provider"></account-card>
+                </div>
+            </template>
+        </div>
     </div>
 </template>
 
 <script>
+    import AccountCard from '@components/AccountCard.vue';
+
     export default {
+        components : {
+            AccountCard
+        },
         created() {
             this.$store.dispatch('rooms/get')
             this.$store.dispatch('providers/get')

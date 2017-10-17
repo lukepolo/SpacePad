@@ -1,3 +1,14 @@
 .fa-bars {
   cursor: pointer;
 }
+
+.navbar-brand {
+  background-color : $color-primary;
+  a {
+    color : $color-text-inverse !important;
+    &:hover {
+      background-color: lighten($color-primary, 10%);
+    }
+  }
+
+}
