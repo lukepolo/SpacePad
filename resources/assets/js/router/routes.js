@@ -1,10 +1,10 @@
-import Rooms from "./Rooms.vue";
-import Room from "./room/Room.vue";
-import Dashboard from "./Dashboard.vue";
-import AppSpace from "./../components/AppSpace.vue";
-import PageNotFound from "../components/PageNotFound.vue";
+import Rooms from "@views/Rooms.vue";
+import Room from "@views/room/Room.vue";
+import Dashboard from "@views/Dashboard.vue";
+import AppSpace from "@components/AppSpace.vue";
+import PageNotFound from "@components/PageNotFound.vue";
 
-export default [
+const routes = [
   {
     path: "/",
     component: AppSpace,
@@ -20,3 +20,5 @@ export default [
   { path: "/rooms/:room", name: "room", component: Room },
   { path: "*", component: PageNotFound }
 ];
+
+export default routes;

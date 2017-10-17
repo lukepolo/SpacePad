@@ -3,5 +3,5 @@ export const back = () => {
 };
 
 export const action = (action, parameters) => {
-  // return laroute.action(action, parameters);
+  return laroute.action(action, parameters);
 };

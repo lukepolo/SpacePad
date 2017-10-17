@@ -37,6 +37,7 @@ mix
     .webpackConfig({
         resolve : {
             alias : {
+                '@': path.join(__dirname, 'resources/assets/js'),
                 '@store': path.join(__dirname, 'resources/assets/js/store'),
                 '@views': path.join(__dirname, 'resources/assets/js/views'),
                 '@classes': path.join(__dirname, 'resources/assets/js/classes'),
