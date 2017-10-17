@@ -6,9 +6,6 @@ export const get = ({}, provider) => {
 };
 
 export const store = ({}, data) => {
-  Vue.$request(data)
+  return Vue.$request(data)
     .post(`/api/providers/${data.provider}/rooms`, "rooms/add")
-    .then(room => {
-      Vue.$router.push(`/rooms/${room.id}`);
-    });
 };

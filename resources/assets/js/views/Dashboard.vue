@@ -18,6 +18,9 @@
                 <router-link :to="{ name : 'room', params : { room : room.id }}">
                     {{ room.name }}
                 </router-link>
+                <router-link :to="{ name : 'room-modify', params : { room : room.id }}">
+                    [modify]
+                </router-link>
             </div>
         </template>
 

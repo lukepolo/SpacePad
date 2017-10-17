@@ -1,6 +1,7 @@
 import Rooms from "@views/Rooms.vue";
 import Room from "@views/room/Room.vue";
 import Dashboard from "@views/Dashboard.vue";
+import RoomForm from "@views/room/RoomForm.vue";
 import AppSpace from "@components/AppSpace.vue";
 import PageNotFound from "@components/PageNotFound.vue";
 
@@ -18,6 +19,7 @@ const routes = [
     ]
   },
   { path: "/rooms/:room", name: "room", component: Room },
+  { path: "/rooms/:room/modify", name: "room-modify", component: RoomForm },
   { path: "*", component: PageNotFound }
 ];
 

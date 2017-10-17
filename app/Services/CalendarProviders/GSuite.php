@@ -121,8 +121,8 @@ class GSuite implements CalendarProviderInterface
             foreach($calendarList->getItems() as $room) {
                 if(str_contains(strtolower($room->getSummary()), 'room')) {
                     $rooms[] = [
-                        'name' => $room->getSummary(),
                         'room' => $room->getId(),
+                        'name' => $room->getSummary(),
                     ];
                 }
             }
