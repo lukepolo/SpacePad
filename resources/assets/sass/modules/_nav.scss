@@ -2,7 +2,7 @@
   cursor: pointer;
 }
 
-.navbar-brand {
+.navbar {
   background-color : $color-primary;
   a {
     color : $color-text-inverse !important;
@@ -10,5 +10,4 @@
       background-color: lighten($color-primary, 10%);
     }
   }
-
 }
