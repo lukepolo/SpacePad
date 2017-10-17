@@ -21,11 +21,11 @@ class UsersController extends Controller
             'email' => $request->get('email')
         ]);
 
-        if ($request->has('password')) {
-            $user->password = bcrypt($request->get('password'));
+        if ($request->has('password') && !empty($request->get('password'))) {
+            $user->update([
+                'password' => bcrypt($request->get('password'))
+            ]);
         }
-
-        $user->save();
 
         return response()->json($user);
     }

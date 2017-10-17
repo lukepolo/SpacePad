@@ -33,7 +33,7 @@
                     <div class="field">
                         <label class="label">Confirm Password</label>
                         <div class="control">
-                            <input class="input" type="password" v-model="form.password_confirmed">
+                            <input class="input" type="password" v-model="form.password_confirmation">
                         </div>
                     </div>
 
@@ -53,7 +53,7 @@
                     name : null,
                     email : null,
                     password : null,
-                    password_confirmed : null
+                    password_confirmation : null
                 })
             }
         },

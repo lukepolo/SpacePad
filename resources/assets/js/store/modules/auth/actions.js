@@ -1,4 +1,5 @@
 export const logout = (context, data) => {
+    alert('got here')
   return Vue.$request(data)
     .post('/logout')
     .then(() => {
