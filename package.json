@@ -23,6 +23,7 @@
         "lodash": "^4.17.4",
         "moment-precise-range-plugin": "^1.2.4",
         "moment-timezone": "^0.5.13",
+        "normalize.css": "^7.0.0",
         "nprogress": "^0.2.0",
         "prettier": "^1.7.4",
         "pusher-js": "^4.2.1",

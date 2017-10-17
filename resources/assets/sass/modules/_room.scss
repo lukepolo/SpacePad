@@ -1,0 +1,27 @@
+html, body, #app-layout, #room, #room-content {
+  height : 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.side-menu {
+  color : $white;
+  position: absolute;
+  top:0;
+  bottom:0;
+  background-color: $black;
+  width : 500px;
+  .menu-label {
+    color : lighten($gray, 10%);
+  }
+
+  .menu-list {
+    a {
+      color : $white;
+      &:hover {
+        background-color : lighten($black, 10%);
+      }
+    }
+  }
+}

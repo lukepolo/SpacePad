@@ -1,0 +1,41 @@
+// VARIABLES ===============================================
+// =========================================================
+
+
+// COLOR VARIABLES -----------------------------------------
+// ---------------------------------------------------------
+$white:                         #FFFFFF;
+$black:                         #2B2B2B;
+$gray:                          #3C3F41;
+$grayLight:                     #B6B6B6;
+
+$blue:                          #48ACF0;
+$red:                           #F4645F;
+$green:                         #83B692;
+$yellow:                        #FEC07A;
+
+// COLOR DECLARATIONS
+$color-background:              $gray                           !default;
+$color-primary:                 $blue                           !default;
+$color-accent:                  $red                            !default;
+$color-text-primary:            $white                          !default;
+$color-text-secondary:          $grayLight                      !default;
+$color-text-inverse:            $black                          !default;
+$color-text-accent:             $blue                           !default;
+$color-divider:                 $black                          !default;
+
+
+// FONT VARIABLES ------------------------------------------
+// ---------------------------------------------------------
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i|Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i");
+@import url("https://fonts.googleapis.com/css?family=Cutive+Mono");
+
+// Logo Font                    'AKASHI' https://www.fontsquirrel.com/fonts/Akashi
+$font-body:                     'Roboto', sans-serif            !default;
+$font-heading:                  'Open Sans', serif              !default;
+$font-size:                     15px                            !default;
+$font-weight:                   300                             !default;
+
+// LAYOUT VARIABLES ----------------------------------------
+// ---------------------------------------------------------
+$spacing:                       20px                            !default;
