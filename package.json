@@ -7,7 +7,8 @@
         "watch-poll": "npm run watch -- --watch-poll",
         "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
         "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "pretty": "prettier --write './resources/assets/js/**/*.*(js|json)'"
     },
     "devDependencies": {
         "browser-sync": "^2.18.13",
@@ -23,6 +24,7 @@
         "moment-precise-range-plugin": "^1.2.4",
         "moment-timezone": "^0.5.13",
         "nprogress": "^0.2.0",
+        "prettier": "^1.7.4",
         "pusher-js": "^4.2.1",
         "raven-js": "^3.17.0",
         "vue": "^2.5.2",

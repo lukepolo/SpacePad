@@ -1,4 +1,5 @@
 import Errors from "./Errors";
+import { showError } from "@helpers/notifications";
 
 class Request {
   /**
@@ -121,34 +122,32 @@ class Request {
     return new Promise((resolve, reject) => {
       const data = this.formData ? this.formData : this.data();
 
-      axios
-        [requestType](url, data, config)
+      axios[requestType](url, data, config)
         .then(response => {
+          this.onSuccess();
 
-            this.onSuccess();
+          if (_.isString(mutations)) {
+            mutations = [mutations];
+          }
 
-            if (_.isString(mutations)) {
-              mutations = [mutations];
-            }
-
-            if (mutations && mutations.length) {
-              _.each(mutations, mutation => {
-                app.$store.commit(mutation, {
-                  response: response.data,
-                  requestData: this.data()
-                });
+          if (mutations && mutations.length) {
+            _.each(mutations, mutation => {
+              Vue.$store.commit(mutation, {
+                response: response.data,
+                requestData: this.data()
               });
-            }
+            });
+          }
 
-            if (!this.resetData) {
-                this.setOriginalData();
-            }
+          if (!this.resetData) {
+            this.setOriginalData();
+          }
 
           resolve(response.data);
         })
         .catch(error => {
           if (error.response) {
-            app.handleApiError(error.response);
+            this.handleApiError(error.response);
             this.onFail(error.response.data);
             reject(error.response.data);
           } else {
@@ -195,6 +194,29 @@ class Request {
         );
       }
     return str.join("&");
+  }
+
+  handleApiError(response) {
+    let message = response;
+
+    if (_.isObject(response)) {
+      if (_.isSet(response.errors)) {
+        message = response.errors;
+      } else if (_.isObject(response.data)) {
+        message = "";
+        _.each(response.data.errors, function(error) {
+          message += error + "<br>";
+        });
+      } else {
+        message = response.data;
+      }
+    }
+
+    if (_.isString(message)) {
+      showError(message);
+    } else {
+      console.warn("UNABLE TO PARSE ERROR");
+    }
   }
 }
 

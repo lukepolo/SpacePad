@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { default as routes } from "../app/routes.js";
+import { default as routes } from "../views/routes.js";
 
 window.VueRouter = require("vue-router/dist/vue-router.common");
 
