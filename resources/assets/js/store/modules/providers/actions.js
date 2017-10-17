@@ -3,5 +3,8 @@ export const get = () => {
 };
 
 export const destroy = ({}, provider) => {
-  return Vue.$request(provider).delete(`api/providers/${provider}`, 'providers/remove');
-}
+  return Vue.$request(provider).delete(
+    `api/providers/${provider}`,
+    "providers/remove"
+  );
+};
