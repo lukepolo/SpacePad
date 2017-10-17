@@ -37,10 +37,10 @@
     font-size: 22px;
     line-height: 14px;
     float: right;
-    color: rgba($color-text-primary, .5);
+    color: rgba($color-button-text-primary, .5);
 
     &:hover {
-      color: $color-text-primary;
+      color: $color-button-text-primary;
     }
 
     &:focus {

@@ -5,7 +5,7 @@
 .navbar {
   background-color : $color-primary;
   a {
-    color : $color-text-inverse !important;
+    color : $color-button-text-primary !important;
     &:hover {
       background-color: lighten($color-primary, 10%);
     }
