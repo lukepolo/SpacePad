@@ -2,7 +2,7 @@
     <div class="card">
         <header class="card-header">
             <div class="card-header-title">
-                <h3>Available Rooms</h3>
+                <h3>Adding a new room</h3>
             </div>
         </header>
         <div class="card-content">
@@ -13,13 +13,15 @@
                 <template v-else>
                     <template v-if="notCreatedRooms.length">
                         <template v-for="room in notCreatedRooms">
-                            <div @click="createRoom(room)">
-                                {{ room.name }}
-                            </div>
+                            {{ room.name }}
+                            <a @click.prevent="createRoom(room)">
+                                [create]
+                            </a>
                         </template>
                     </template>
                     <template v-else>
-                        <router-link to="/">You do not have anymore rooms that you can create!</router-link>
+                        <div>You do not have anymore rooms that you can create!</div>
+                        <router-link to="/">back to dashboard...</router-link>
                     </template>
                 </template>
             </div>
