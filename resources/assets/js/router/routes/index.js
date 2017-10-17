@@ -15,11 +15,11 @@ const routes = [
         path: "/provider/:provider/rooms",
         name: "provider_rooms",
         component: Rooms
-      }
+      },
+      { path: "/rooms/:room/modify", name: "room-modify", component: RoomForm }
     ]
   },
   { path: "/rooms/:room", name: "room", component: Room },
-  { path: "/rooms/:room/modify", name: "room-modify", component: RoomForm },
   { path: "*", component: PageNotFound }
 ];
 

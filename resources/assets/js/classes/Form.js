@@ -20,6 +20,18 @@ class Form extends Request {
     this.errors.clear();
   }
 
+  fill(data) {
+    this.empty();
+
+    for (const field in this.data()) {
+      if (data[field]) {
+        Vue.set(this, field, data[field]);
+      }
+    }
+
+    this.setOriginalData();
+  }
+
   /**
      * Handle a successful form submission.
      *

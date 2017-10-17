@@ -10,6 +10,10 @@ class Room extends Model
         'id'
     ];
 
+    protected $casts = [
+        'features' => 'array'
+    ];
+
     /*
      |--------------------------------------------------------------------------
      | Relations
