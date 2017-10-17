@@ -33,20 +33,36 @@
             <router-link class="card-footer-item" :to="{ name : 'provider_rooms', params : { provider : account.id }}">
                 Add Room
             </router-link>
-            <a href="#" class="card-footer-item">Edit</a>
-            <a href="#" class="card-footer-item">Delete</a>
+            <a @click.prevent="showDeleteModal = true" class="card-footer-item">Delete</a>
         </footer>
+        <modal v-if="showDeleteModal" @close="showDeleteModal = false" @confirm="deleteAccount">Do you wish to delete this ({{ account.email }}) account?</modal>
     </div>
 </template>
 
 <script>
+    import Modal from '@components/Modal.vue'
     export default {
+        components : {
+            Modal
+        },
         props: ['account'],
+        data() {
+            return {
+                showDeleteModal : false,
+            }
+        },
         computed : {
             rooms() {
                 return _.filter(this.$store.state.rooms.rooms, (room) => {
                     return this.account.id === parseInt(room.room_provider_id);
                 });
+            }
+        },
+        methods : {
+            deleteAccount() {
+                this.$store.dispatch('providers/destroy', this.account.id).then(() => {
+                    this.showDeleteModal = false
+                })
             }
         }
     }
