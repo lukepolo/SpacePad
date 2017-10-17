@@ -8,7 +8,7 @@
                 <a class="navbar-item" style="margin-left: auto;">
                     My Profile
                 </a>
-                <a class="navbar-item">
+                <a class="navbar-item" @click="logout">
                     Logout
                 </a>
             </div>
@@ -33,6 +33,11 @@
         data () {
             return {
                 current_version: Laravel.version
+            }
+        },
+        methods : {
+            logout() {
+                this.$store.dispatch('auth/logout');
             }
         },
         computed : {
