@@ -12,6 +12,9 @@
 */
 
 Route::group(['middleware' => 'auth:api'], function() {
+
+    Route::apiResource('users', 'UsersController');
+
     Route::get('providers', 'ProvidersController@index');
     Route::apiResource('providers.rooms', 'ProviderRoomsController');
 

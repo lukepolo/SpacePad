@@ -5,9 +5,9 @@
                 <router-link to="/" class="navbar-item">
                     Space Pad
                 </router-link>
-                <a class="navbar-item" style="margin-left: auto;">
+                <router-link :to="{ name : 'my-profile' }" class="navbar-item" style="margin-left: auto;">
                     My Profile
-                </a>
+                </router-link>
                 <a class="navbar-item" @click="logout">
                     Logout
                 </a>

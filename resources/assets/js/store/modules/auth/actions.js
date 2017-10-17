@@ -1,7 +1,11 @@
 export const logout = (context, data) => {
   return Vue.$request(data)
-    .post(Vue.$action("AuthLoginController@logout"))
+    .post('/logout')
     .then(() => {
       window.location = "/";
     });
+};
+
+export const update = (context, data) => {
+    return Vue.$request(data.form).patch(`/api/users/${data.user}`)
 };

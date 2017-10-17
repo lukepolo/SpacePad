@@ -10,7 +10,6 @@ require("./bootstrap");
 Vue.config.productionTip = false;
 
 Vue.$store = store;
-Vue.$action = action;
 Vue.$router = router;
 
 Vue.$request = data => {

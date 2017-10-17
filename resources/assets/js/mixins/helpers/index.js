@@ -1,6 +1,6 @@
 import { createForm } from "./form";
 
-import { back, action } from "./routes";
+import { back } from "./routes";
 
 import { now, parseDate, formatTime, humanizeDiff } from "./date-time";
 
@@ -14,7 +14,6 @@ Vue.mixin({
   methods: {
     now,
     back,
-    action,
     showError,
     parseDate,
     formatTime,
