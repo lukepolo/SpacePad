@@ -1,5 +1,5 @@
 <template>
-    <div class="card">
+    <div class="card" v-if="room">
         <header class="card-header">
             <div class="card-header-title">
                 <h3>{{ room.name }}</h3>
