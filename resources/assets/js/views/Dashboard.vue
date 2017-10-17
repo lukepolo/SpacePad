@@ -1,6 +1,11 @@
 <template>
     <div>
-        Lets connect your first provider
+        <template v-if="providers.length == 0 ">
+            Lets connect your first account
+        </template>
+        <template v-else>
+            Connect a new account
+        </template>
 
         <a href="/provider/office365/link">Office 365</a>
         <a href="/provider/gsuite/link">GSuite</a>
