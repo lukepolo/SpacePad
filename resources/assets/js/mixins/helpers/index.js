@@ -1,14 +1,8 @@
-import { createForm, getFormData } from "./form";
+import { createForm } from "./form";
 
 import { back, action } from "./routes";
 
-import {
-  now,
-  parseDate,
-  formatTime,
-  humanizeDiff,
-  getTimeHeightStyle
-} from "./date-time";
+import { now, parseDate, formatTime, humanizeDiff } from "./date-time";
 
 import { local } from "./environment";
 
@@ -20,15 +14,13 @@ Vue.mixin({
   methods: {
     now,
     back,
-    humanizeDiff,
     action,
     showError,
     parseDate,
     formatTime,
     createForm,
     showSuccess,
-    getFormData,
-    getTimeHeightStyle
+    humanizeDiff
   },
   computed: {
     local,

@@ -15,21 +15,3 @@ export const humanizeDiff = (date1, date2) => {
 export const formatTime = date => {
   return parseDate(date).format("h:mm A");
 };
-
-export const getTimeHeightStyle = (startDate, endDate) => {
-  let startDateParsed = parseDate(startDate);
-  let startEM =
-    (startDateParsed.format("HH") * 60 +
-      parseInt(startDateParsed.format("mm"))) *
-    6 /
-    60;
-
-  let endDateParsed = parseDate(endDate);
-  let endEm =
-    (endDateParsed.format("HH") * 60 + parseInt(endDateParsed.format("mm"))) *
-      6 /
-      60 -
-    startEM;
-
-  return `top:${startEM}em; height:${endEm}em;`;
-};
