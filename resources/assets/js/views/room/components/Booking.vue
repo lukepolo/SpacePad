@@ -19,14 +19,14 @@
                 this.$store.commit('rooms/events/set', this.booking)
             },
             getTimeHeightStyle(startDate, endDate) {
-                let startDateParsed = parseDate(startDate);
+                let startDateParsed = this.parseDate(startDate);
                 let startEM =
                     (startDateParsed.format("HH") * 60 +
                         parseInt(startDateParsed.format("mm"))) *
                     6 /
                     60;
 
-                let endDateParsed = parseDate(endDate);
+                let endDateParsed = this.parseDate(endDate);
                 let endEm =
                     (endDateParsed.format("HH") * 60 + parseInt(endDateParsed.format("mm"))) *
                     6 /

@@ -1,27 +1,40 @@
 <template>
     <div>
        <form @submit.prevent="updateRoom">
-           <label>
-               Name
-           </label>
-           <input type="text" v-model="form.name">
+           <div class="field">
+               <label class="label">Name</label>
+               <div class="control">
+                   <input class="input" type="text" v-model="form.name">
+               </div>
+           </div>
 
-           <label>
-               Features
-           </label>
+
            <template v-for="(value, feature) in form.features">
-               <label>{{ feature }}</label>
-               <input type="checkbox" v-model="form.features[feature]">
+               <div class="field">
+                   <div class="control">
+                       <label class="checkbox">
+                           <input type="checkbox" v-model="form.features[feature]">
+                           {{ feature }}
+                       </label>
+                   </div>
+               </div>
            </template>
 
-           <label>
-               Capacity
-           </label>
-           <input type="number" v-model="form.capacity">
+           <div class="field">
+               <label class="label">Capacity</label>
+               <div class="control">
+                   <input class="input" type="number" v-model="form.capacity">
+               </div>
+           </div>
 
-           <textarea v-model="form.comments"></textarea>
+           <div class="field">
+               <label class="label">Comments</label>
+               <div class="control">
+                   <textarea class="textarea" v-model="form.comments"></textarea>
+               </div>
+           </div>
 
-           <button type="submit">Update</button>
+           <button class="btn" type="submit">Update</button>
        </form>
     </div>
 </template>

@@ -47,7 +47,7 @@
                         <br><br><br><br>
 
                         <template v-if="currentBooking == selectedBooking">
-                            <div class="button" @click="endBooking">End Booking</div>
+                            <div class="btn" @click="endBooking">End Booking</div>
                         </template>
 
                     </div>
@@ -60,7 +60,7 @@
                     <div class="level-left">
                         <div class="level-item">
                             <template v-if="checkingIntoBooking && !checkingIntoBooking.checked_in">
-                                <div class="button" @click="checkIn()">
+                                <div class="btn" @click="checkIn()">
                                     Check In
                                 </div>
                             </template>
@@ -72,10 +72,10 @@
                         <template v-if="!currentBooking">
                             <div class="book-room-container">
                                 <span>Book</span>
-                                <span class="button" @click="bookRoom(15)">15</span>
-                                <span class="button" @click="bookRoom(30)">30</span>
-                                <span class="button" @click="bookRoom(45)">45</span>
-                                <span class="button" @click="bookRoom(60)">60</span>
+                                <span class="btn" @click="bookRoom(15)">15</span>
+                                <span class="btn" @click="bookRoom(30)">30</span>
+                                <span class="btn" @click="bookRoom(45)">45</span>
+                                <span class="btn" @click="bookRoom(60)">60</span>
                             </div>
                         </template>
                         <p class="level-item" @click="showSideMenu=true">
