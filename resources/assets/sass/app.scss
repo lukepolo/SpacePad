@@ -36,3 +36,28 @@ h3 {
 small {
   font-size : .5em;
 }
+
+.fa-bars {
+  cursor: pointer;
+}
+
+.side-menu {
+  color : $white;
+  position: absolute;
+  top:0;
+  bottom:0;
+  background-color: $black;
+  width : 500px;
+  .menu-label {
+    color : lighten($gray, 10%);
+  }
+
+  .menu-list {
+    a {
+      color : $white;
+      &:hover {
+        background-color : lighten($black, 10%);
+      }
+    }
+  }
+}

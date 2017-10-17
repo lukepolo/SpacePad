@@ -85,3 +85,7 @@ window.Echo = new Echo({
 //         .addPlugin(RavenVue, Vue)
 //         .install();
 // }
+
+// Font awesome PRO
+require("./../vendor/fontawesome-5.0.0-rc2/js/packs/light");
+require("./../vendor/fontawesome-5.0.0-rc2/js/fontawesome");

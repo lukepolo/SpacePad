@@ -2,7 +2,6 @@
 
 namespace App\Services\CalendarProviders;
 
-use App\Exceptions\InvalidBookingRequest;
 use Carbon\Carbon;
 use App\Models\Room;
 use GuzzleHttp\Client;
@@ -13,6 +12,7 @@ use Illuminate\Support\Collection;
 use App\Exceptions\InvalidUserRequest;
 use App\Exceptions\InvalidRoomsRequest;
 use App\Exceptions\InvalidTokenRequest;
+use App\Exceptions\InvalidBookingRequest;
 use GuzzleHttp\Exception\ClientException;
 use App\Exceptions\InvalidCalendarRequest;
 

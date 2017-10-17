@@ -5,6 +5,9 @@
             <nav class="room-header level" :class="{ booked : currentBooking , free : !currentBooking}">
                 <!-- Left side -->
                 <div class="level-left">
+                    <span @click="showSideMenu=true">
+                        <i class="fal fa-bars"></i>
+                    </span>
                     <h2>{{ room.name }}</h2>
                 </div>
                 <!-- Right side -->
@@ -75,13 +78,29 @@
                                 <span class="button" @click="bookRoom(60)">60</span>
                             </div>
                         </template>
-                        <p class="level-item">
-                            Find Another space <-- TODO
+                        <p class="level-item" @click="showSideMenu=true">
+                            Find Another space
                         </p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <transition name="slide">
+            <aside class="side-menu" v-if="showSideMenu">
+                <p class="menu-label">
+                    <span @click="showSideMenu=false">
+                        <i class="fal fa-bars"></i>
+                    </span>
+                    Manage
+                </p>
+                <ul class="menu-list">
+                    <li><a>Change Room</a></li>
+                    <li><a>Edit Rooms Details</a></li>
+                </ul>
+            </aside>
+        </transition>
+
     </div>
 </template>
 
@@ -93,6 +112,11 @@
         components : {
             Calendar,
             BookingAttendees,
+        },
+        data() {
+          return {
+              showSideMenu : false
+          }
         },
         created() {
             this.$store.dispatch('rooms/show', this.$route.params.room);
@@ -144,7 +168,7 @@
             selectedBooking() {
                 let selectedBooking = this.$store.state.rooms.events.event;
                 if(!selectedBooking) {
-                    return this.nextBooking
+                    return this.checkingIntoBooking
                 }
                 return selectedBooking
             },
