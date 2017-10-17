@@ -73,6 +73,8 @@
                 this.$store.dispatch('rooms/update', {
                     form : this.form,
                     room : this.$route.params.room
+                }).then(() => {
+                    this.$router.push('/')
                 })
             }
         },

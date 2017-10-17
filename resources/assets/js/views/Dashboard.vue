@@ -6,17 +6,14 @@
         <template v-else>
             Connect a new account
         </template>
-
         <a href="/provider/office365/link">Office 365</a>
         <a href="/provider/gsuite/link">GSuite</a>
-
         <h3>Connected Accounts</h3>
         <template v-for="provider in providers">
             <router-link :to="{ name : 'provider_rooms', params : { provider : provider.id }}">
                 {{ provider.email }} [{{ provider.provider }}]
             </router-link>
         </template>
-
         <h3>Rooms</h3>
         <template v-for="room in rooms">
             <div>
@@ -28,7 +25,6 @@
                 </router-link>
             </div>
         </template>
-
     </div>
 </template>
 
