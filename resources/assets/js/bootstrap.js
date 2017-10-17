@@ -4,8 +4,6 @@
  |--------------------------------------------------------------------------
  |
  */
-
-window.laroute = require("./laroute");
 window.moment = require("moment-timezone");
 require("moment-precise-range-plugin");
 moment.tz.setDefault("UTC");
@@ -87,5 +85,5 @@ window.Echo = new Echo({
 // }
 
 // Font awesome PRO
-require("./../vendor/fontawesome-5.0.0-rc2/js/packs/light");
-require("./../vendor/fontawesome-5.0.0-rc2/js/fontawesome");
+require("@/../vendor/fontawesome-5.0.0-rc2/js/packs/light");
+require("@/../vendor/fontawesome-5.0.0-rc2/js/fontawesome");

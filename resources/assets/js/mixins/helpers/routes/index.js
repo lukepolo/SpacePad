@@ -1,3 +1,5 @@
+const laroute = require("@/laroute");
+
 export const back = () => {
   window.history.back();
 };

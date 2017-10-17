@@ -4,9 +4,9 @@ import { back, action } from "./routes";
 
 import {
   now,
-  humanizeDiff,
   parseDate,
   formatTime,
+  humanizeDiff,
   getTimeHeightStyle
 } from "./date-time";
 
