@@ -1,10 +1,20 @@
 <template>
     <div>
         <h3>Available Rooms</h3>
-        <template v-for="room in notCreatedRooms">
-            <div @click="createRoom(room)">
-                {{ room.name }}
-            </div>
+        <template v-if="loading">
+            Loading
+        </template>
+        <template v-else>
+            <template v-if="notCreatedRooms.length">
+                <template v-for="room in notCreatedRooms">
+                    <div @click="createRoom(room)">
+                        {{ room.name }}
+                    </div>
+                </template>
+            </template>
+            <template v-else>
+                <router-link to="/">You do not have anymore rooms that you can create!</router-link>
+            </template>
         </template>
     </div>
 </template>
@@ -13,7 +23,14 @@
     export default {
         created() {
             this.$store.dispatch('rooms/get')
-            this.$store.dispatch('providers/rooms/get', this.$route.params.provider);
+            this.$store.dispatch('providers/rooms/get', this.$route.params.provider).then(() => {
+                this.loading = false;
+            });
+        },
+        data() {
+            return {
+                loading : true
+            }
         },
         methods : {
             createRoom(room) {

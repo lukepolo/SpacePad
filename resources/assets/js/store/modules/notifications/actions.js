@@ -1,7 +1,7 @@
 export const add = ({ commit }, notification) => {
-  commit("add", notification);
+  return commit("add", notification);
 };
 
 export const remove = ({ commit }, notification) => {
-  commit("remove", notification);
+  return commit("remove", notification);
 };
