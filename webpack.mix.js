@@ -48,8 +48,8 @@ mix
     })
     .browserSync({
         open: "external",
-        host: "space-pad.dev",
-        proxy: "space-pad.dev",
+        host: "space-pad.test",
+        proxy: "space-pad.test",
         files: [
             "resources/views/**/*.php",
             "public/js/**/*.js",
