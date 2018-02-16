@@ -3,11 +3,11 @@ import { showError } from "@helpers/notifications";
 
 class Request {
   /**
-     * Create a new Form instance.
-     *
-     * @param {object, FormData} data
-     * @param {boolean} reset
-     */
+   * Create a new Form instance.
+   *
+   * @param {object, FormData} data
+   * @param {boolean} reset
+   */
   constructor(data, reset) {
     this.resetData = reset || false;
 
@@ -30,8 +30,8 @@ class Request {
   }
 
   /**
-     * Fetch all relevant data for the form.
-     */
+   * Fetch all relevant data for the form.
+   */
   data() {
     if (this.formData) {
       return this.formData;
@@ -48,12 +48,12 @@ class Request {
   }
 
   /**
-     * Send a GET request to the given URL.
-     *
-     * @param {string} url
-     * @param {string|array} mutations
-     * @param {array} config
-     */
+   * Send a GET request to the given URL.
+   *
+   * @param {string} url
+   * @param {string|array} mutations
+   * @param {array} config
+   */
   get(url, mutations, config) {
     for (const value in config) {
       this[value] = config[value];
@@ -67,57 +67,57 @@ class Request {
   }
 
   /**
-     * Send a POST request to the given URL.
-     *
-     * @param {string} url
-     * @param {string|array} mutations
-     * @param {array} config
-     */
+   * Send a POST request to the given URL.
+   *
+   * @param {string} url
+   * @param {string|array} mutations
+   * @param {array} config
+   */
   post(url, mutations, config) {
     return this.submit("post", url, mutations, config);
   }
 
   /**
-     * Send a PUT request to the given URL.
-     *
-     * @param {string} url
-     * @param {string|array} mutations
-     * @param {array} config
-     */
+   * Send a PUT request to the given URL.
+   *
+   * @param {string} url
+   * @param {string|array} mutations
+   * @param {array} config
+   */
   put(url, mutations, config) {
     return this.submit("put", url, mutations, config);
   }
 
   /**
-     * Send a PATCH request to the given URL.
-     *
-     * @param {string} url
-     * @param {string|array} mutations
-     * @param {array} config
-     */
+   * Send a PATCH request to the given URL.
+   *
+   * @param {string} url
+   * @param {string|array} mutations
+   * @param {array} config
+   */
   patch(url, mutations, config) {
     return this.submit("patch", url, mutations, config);
   }
 
   /**
-     * Send a DELETE request to the given URL.
-     *
-     * @param {string} url
-     * @param {string|array} mutations
-     * @param {array} config
-     */
+   * Send a DELETE request to the given URL.
+   *
+   * @param {string} url
+   * @param {string|array} mutations
+   * @param {array} config
+   */
   delete(url, mutations, config) {
     return this.submit("delete", url, mutations, config);
   }
 
   /**
-     * Submit the form.
-     *
-     * @param {string} requestType
-     * @param {string} url
-     * @param {string|array} mutations
-     * @param {array} config
-     */
+   * Submit the form.
+   *
+   * @param {string} requestType
+   * @param {string} url
+   * @param {string|array} mutations
+   * @param {array} config
+   */
   submit(requestType, url, mutations, config) {
     return new Promise((resolve, reject) => {
       const data = this.formData ? this.formData : this.data();
@@ -159,31 +159,31 @@ class Request {
   }
 
   /**
-     * Handle a successful form submission.
-     */
+   * Handle a successful form submission.
+   */
   onSuccess() {
     this.errors.clear();
   }
 
   /**
-     * Handle a failed form submission.
-     *
-     * @param {object} errors
-     */
+   * Handle a failed form submission.
+   *
+   * @param {object} errors
+   */
   onFail(errors) {
     this.errors.record(errors);
   }
 
   /**
-     * Sets the current data to the original data
-     */
+   * Sets the current data to the original data
+   */
   setOriginalData() {
     this.originalData = this.data();
   }
 
   /**
-     * Generates a query string for the data given
-     */
+   * Generates a query string for the data given
+   */
   dataQueryString() {
     let str = [];
     let data = this.data();
