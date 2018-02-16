@@ -15,11 +15,7 @@ if (process.env.NODE_ENV !== "development") {
 */
 mix
   .typeScript("resources/assets/js/app/app.ts", "js")
-  .extract([
-    "vue",
-    "vue-router",
-    "vuex"
-  ])
+  .extract(["vue", "vue-router", "vuex"])
   .sass("resources/assets/sass/app.scss", "css")
   .browserSync({
     open: "external",
@@ -39,7 +35,10 @@ mix
         "@models": path.join(__dirname, "resources/assets/js/app/models"),
         "@resources": path.join(__dirname, "resources/assets/js/resources"),
         "@views": path.join(__dirname, "resources/assets/js/resources/views"),
-        "@components": path.join(__dirname, "resources/assets/js/app/components")
+        "@components": path.join(
+          __dirname,
+          "resources/assets/js/app/components"
+        )
       }
     }
   })
