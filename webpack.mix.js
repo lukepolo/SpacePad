@@ -1,58 +1,48 @@
-const mix = require('laravel-mix');
+const path = require("path");
+const mix = require("laravel-mix");
+const env = require("dotenv").config().parsed;
+
+if (process.env.NODE_ENV !== "development") {
+  mix.config.production = true;
+}
 
 /*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for the application as well as bundling up all the JS files.
- |
- */
-
+|--------------------------------------------------------------------------
+| Mix Asset Management
+|--------------------------------------------------------------------------
+| https://github.com/JeffreyWay/laravel-mix/tree/master/docs#readme
+|
+*/
 mix
-    .js("resources/assets/js/app.js", "public/js")
-    .sass("resources/assets/sass/app.scss", "public/css")
-    .extract([
-        "vue",
-        "vuex",
-        "axios",
-        "lodash",
-        "raven-js",
-        "nprogress",
-        "pusher-js",
-        "vue-router",
-        "laravel-echo",
-        "moment-timezone",
-        "moment-precise-range-plugin"
-    ])
-    .autoload({
-        vue: "Vue",
-        lodash: "_",
-        "pusher-js": "Pusher"
-    })
-    .sourceMaps()
-    .version()
-    .webpackConfig({
-        resolve : {
-            alias : {
-                '@': path.join(__dirname, 'resources/assets/js'),
-                '@store': path.join(__dirname, 'resources/assets/js/store'),
-                '@views': path.join(__dirname, 'resources/assets/js/views'),
-                '@classes': path.join(__dirname, 'resources/assets/js/classes'),
-                '@components': path.join(__dirname, 'resources/assets/js/components'),
-                '@helpers': path.join(__dirname, 'resources/assets/js/mixins/helpers'),
-            }
-        }
-    })
-    .browserSync({
-        open: "external",
-        host: "space-pad.dev",
-        proxy: "space-pad.dev",
-        files: [
-            "resources/views/**/*.php",
-            "public/js/**/*.js",
-            "public/css/**/*.css"
-        ]
-    });
+  .typeScript("resources/assets/js/app/app.ts", "js")
+  .extract(["vue", "vue-router", "vuex"])
+  .sass("resources/assets/sass/app.scss", "css")
+  .browserSync({
+    open: "external",
+    host: env ? env.APP_URL : "varie.test",
+    proxy: env ? env.APP_URL : "varie.test",
+    files: ["public/**/*.js", "public/**/*.css"]
+  })
+  .sourceMaps()
+  .webpackConfig({
+    resolve: {
+      symlinks: false,
+      alias: {
+        "@app": path.join(__dirname, "resources/assets/js/app"),
+        "@routes": path.join(__dirname, "resources/assets/js/routes"),
+        "@config": path.join(__dirname, "resources/assets/js/config"),
+        "@store": path.join(__dirname, "resources/assets/js/app/store"),
+        "@models": path.join(__dirname, "resources/assets/js/app/models"),
+        "@resources": path.join(__dirname, "resources/assets/js/resources"),
+        "@views": path.join(__dirname, "resources/assets/js/resources/views"),
+        "@components": path.join(
+          __dirname,
+          "resources/assets/js/app/components"
+        )
+      }
+    }
+  })
+  .options({
+    extractVueStyles: true
+  })
+  .version();
